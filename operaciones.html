@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Operaciones</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html" class="activo">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper" style="max-width:1100px;">
+
+    <div class="page-header">
+      <h2><span class="highlight">Sección de</span> Operaciones</h2>
+      <p>Asigne recursos y registre las tareas operativas del incidente.</p>
+    </div>
+
+    <form class="formulario" id="formOps" novalidate>
+
+      <!-- ASIGNACIÓN DE RECURSOS -->
+      <fieldset class="seccion fade-up">
+        <legend>⚙️ &nbsp;Asignación de Recurso</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Recurso / Unidad</label>
+            <input type="text" id="recurso" placeholder="Ej. Autobomba 01, Ambulancia 3, Equipo rescate" required>
+          </div>
+
+          <div class="campo">
+            <label>Tipo de recurso</label>
+            <select id="tipoRecurso">
+              <option value="">— Seleccionar —</option>
+              <option>Personal</option>
+              <option>Vehículo</option>
+              <option>Equipo especial</option>
+              <option>Materiales</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Responsable / Operador</label>
+            <input type="text" id="responsable" placeholder="Nombre del responsable">
+          </div>
+
+          <div class="campo">
+            <label>Ubicación asignada</label>
+            <input type="text" id="ubicacionRec" placeholder="Zona o sector">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- TAREA OPERATIVA -->
+      <fieldset class="seccion fade-up">
+        <legend>📌 &nbsp;Tarea Operativa</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label class="required">Descripción de la tarea</label>
+            <input type="text" id="tarea" placeholder="Ej. Control del fuego en planta alta" required>
+          </div>
+
+          <div class="campo">
+            <label>Área de operación</label>
+            <input type="text" id="areaOp" placeholder="Ej. Sector Norte, Planta 2">
+          </div>
+
+          <div class="campo">
+            <label>Estado de la tarea</label>
+            <select id="estadoTarea">
+              <option value="Pendiente">Pendiente</option>
+              <option value="En proceso">En proceso</option>
+              <option value="Concluida">Concluida</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Hora de asignación</label>
+            <input type="time" id="horaAsig">
+          </div>
+
+          <div class="campo">
+            <label>Prioridad</label>
+            <select id="prioridad">
+              <option value="Normal">Normal</option>
+              <option value="Alta">Alta</option>
+              <option value="Crítica">Crítica</option>
+            </select>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary" id="btnAgregar">⚙️ &nbsp;Agregar Tarea</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+
+    <!-- TABLA DE TAREAS REGISTRADAS -->
+    <div class="tabla-wrapper" style="margin-top: var(--spacing-xl);">
+      <div class="tabla-header">
+        <h3>⚙️ &nbsp;Tareas Registradas</h3>
+        <span id="contadorTareas" class="badge badge-alerta">0 tareas</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Recurso / Unidad</th>
+            <th>Tarea</th>
+            <th>Área</th>
+            <th>Responsable</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Hora</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody">
+          <tr>
+            <td colspan="9" class="tabla-empty">No hay tareas registradas aún.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Tarea registrada
+      <span>La tarea operativa fue agregada correctamente.</span>
+    </div>
+  </div>
+
+  <script>
+    const tareas = [];
+    const now = new Date();
+
+    document.getElementById('horaAsig').value = now.toTimeString().slice(0,5);
+
+    document.getElementById('formOps').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const recurso    = document.getElementById('recurso').value.trim();
+      const tarea      = document.getElementById('tarea').value.trim();
+      const area       = document.getElementById('areaOp').value.trim();
+      const responsable= document.getElementById('responsable').value.trim();
+      const estado     = document.getElementById('estadoTarea').value;
+      const prioridad  = document.getElementById('prioridad').value;
+      const hora       = document.getElementById('horaAsig').value;
+
+      if (!recurso || !tarea) {
+        if (!recurso) markError('recurso');
+        if (!tarea)   markError('tarea');
+        return;
+      }
+
+      tareas.push({ recurso, tarea, area, responsable, estado, prioridad, hora });
+      renderTabla();
+
+      /* Toast */
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3000);
+
+      this.reset();
+      document.getElementById('horaAsig').value = new Date().toTimeString().slice(0,5);
+    });
+
+    function renderTabla() {
+      const tbody = document.getElementById('tablaBody');
+      const contador = document.getElementById('contadorTareas');
+
+      if (tareas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="tabla-empty">No hay tareas registradas aún.</td></tr>';
+        contador.textContent = '0 tareas';
+        contador.className = 'badge badge-cerrado';
+        return;
+      }
+
+      contador.textContent = tareas.length + ' tarea' + (tareas.length !== 1 ? 's' : '');
+      contador.className = 'badge badge-alerta';
+
+      tbody.innerHTML = tareas.map((t, i) => {
+        const estadoClass = t.estado === 'Concluida' ? 'badge-activo'
+                          : t.estado === 'En proceso' ? 'badge-alerta'
+                          : 'badge-cerrado';
+        const prioClass   = t.prioridad === 'Crítica' ? 'color:var(--color-primary)'
+                          : t.prioridad === 'Alta'    ? 'color:var(--color-amber)'
+                          : 'color:var(--color-text-muted)';
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); color:var(--color-text-dim);">${String(i+1).padStart(2,'0')}</td>
+            <td>${t.recurso}</td>
+            <td>${t.tarea}</td>
+            <td>${t.area || '—'}</td>
+            <td>${t.responsable || '—'}</td>
+            <td><span style="font-family:var(--font-mono);font-size:11px;${prioClass}">${t.prioridad}</span></td>
+            <td><span class="badge ${estadoClass}">${t.estado}</span></td>
+            <td style="font-family:var(--font-mono);font-size:11px;">${t.hora}</td>
+            <td>
+              <button type="button"
+                onclick="eliminarTarea(${i})"
+                style="background:none;border:none;color:var(--color-text-dim);cursor:pointer;font-size:14px;"
+                title="Eliminar">✕</button>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function eliminarTarea(idx) {
+      tareas.splice(idx, 1);
+      renderTabla();
+    }
+
+    function markError(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--color-primary)';
+      el.style.boxShadow   = '0 0 0 3px var(--color-primary-glow)';
+      el.focus();
+      el.addEventListener('input', () => {
+        el.style.borderColor = '';
+        el.style.boxShadow   = '';
+      }, { once: true });
+    }
+  </script>
+
+</body>
+</html>

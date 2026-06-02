@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Panel Principal</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico" id="statusDot"></span>
+      <span id="statusLabel">INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAVEGACIÓN -->
+  <nav class="nav">
+    <a href="dashboard.html"    class="activo">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="dashboard-wrapper">
+
+    <!-- ── FILA DE MÉTRICAS ── -->
+    <div class="dashboard-top">
+
+      <!-- Tarjeta incidente activo (2 columnas) -->
+      <div class="card card-accent card-incidente-activo fade-up">
+        <div class="card-title">
+          <span class="icon">🚨</span>
+          Incidente Activo
+        </div>
+        <div class="incident-header">
+          <div class="incident-folio">
+            <span>Folio</span>
+            INC-001
+          </div>
+          <span class="badge badge-critico">● ACTIVO</span>
+        </div>
+        <div class="incident-grid">
+          <div class="incident-field">
+            <label>Tipo</label>
+            <p>Incendio Estructural</p>
+          </div>
+          <div class="incident-field">
+            <label>Nivel</label>
+            <p style="color:var(--color-primary); font-family:var(--font-display); letter-spacing:1px;">ALTO</p>
+          </div>
+          <div class="incident-field">
+            <label>Ubicación</label>
+            <p>Zona Centro, Metepec</p>
+          </div>
+          <div class="incident-field">
+            <label>Hora de inicio</label>
+            <p id="horaInicio" style="font-family:var(--font-mono);">14:32 hrs</p>
+          </div>
+          <div class="incident-field">
+            <label>Comandante</label>
+            <p>Cap. Víctor Villanueva</p>
+          </div>
+          <div class="incident-field">
+            <label>Tiempo transcurrido</label>
+            <p id="tiempoTranscurrido" style="font-family:var(--font-mono); color:var(--color-amber);">00:00:00</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métrica: Personal -->
+      <div class="card fade-up">
+        <div class="card-title"><span class="icon">👥</span> Personal</div>
+        <div class="metric-value blue">12</div>
+        <div class="metric-label">Elementos desplegados</div>
+        <div class="metric-trend">↑ 4 unidades en camino</div>
+      </div>
+
+      <!-- Métrica: Vehículos -->
+      <div class="card fade-up">
+        <div class="card-title"><span class="icon">🚒</span> Vehículos</div>
+        <div class="metric-value amber">5</div>
+        <div class="metric-label">Unidades en operación</div>
+        <div class="metric-trend">3 autobombas · 2 ambulancias</div>
+      </div>
+
+    </div>
+
+    <!-- ── MÓDULOS DEL SISTEMA ── -->
+    <section class="modules-section">
+      <div class="section-header">
+        <h2 class="section-title">Módulos del Sistema</h2>
+      </div>
+
+      <div class="modules-grid">
+
+        <a href="incidente.html" class="module-card fade-up">
+          <span class="module-num">01</span>
+          <span class="module-icon">🚨</span>
+          <span class="module-name">Incidente</span>
+          <span class="module-desc">Registro y clasificación del incidente, tipo, nivel de emergencia y ubicación.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="comando.html" class="module-card fade-up">
+          <span class="module-num">02</span>
+          <span class="module-icon">🎖</span>
+          <span class="module-name">Comando</span>
+          <span class="module-desc">Estructura del SCI: comandante, staff y jefes de sección.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="operaciones.html" class="module-card fade-up">
+          <span class="module-num">03</span>
+          <span class="module-icon">⚙️</span>
+          <span class="module-name">Operaciones</span>
+          <span class="module-desc">Asignación de recursos, tareas operativas y estado de unidades.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="planeacion.html" class="module-card fade-up">
+          <span class="module-num">04</span>
+          <span class="module-icon">📋</span>
+          <span class="module-name">Planeación</span>
+          <span class="module-desc">Plan de acción, objetivos, estrategia y consideraciones de seguridad.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="logistica.html" class="module-card fade-up">
+          <span class="module-num">05</span>
+          <span class="module-icon">📦</span>
+          <span class="module-name">Logística</span>
+          <span class="module-desc">Control de recursos materiales, vehículos y apoyo al personal.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="victimas.html" class="module-card fade-up">
+          <span class="module-num">07</span>
+          <span class="module-icon">🩺</span>
+          <span class="module-name">Víctimas</span>
+          <span class="module-desc">Registro de personas afectadas, triage START y seguimiento de traslados.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+        <a href="bitacora.html" class="module-card fade-up">
+          <span class="module-num">06</span>
+          <span class="module-icon">📝</span>
+          <span class="module-name">Bitácora</span>
+          <span class="module-desc">Registro cronológico de eventos y acciones durante el incidente.</span>
+          <span class="module-arrow">→</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ── ACTIVIDAD RECIENTE ── -->
+    <section class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Actividad Reciente</h2>
+      </div>
+
+      <div class="activity-list">
+        <div class="activity-item">
+          <span class="activity-dot cmd"></span>
+          <div class="activity-text">
+            Comandante del incidente asignado
+            <span>Módulo: Comando</span>
+          </div>
+          <span class="activity-time" id="time1">14:33</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-dot ops"></span>
+          <div class="activity-text">
+            Autobomba 01 desplegada en Zona Norte
+            <span>Módulo: Operaciones</span>
+          </div>
+          <span class="activity-time" id="time2">14:35</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-dot log"></span>
+          <div class="activity-text">
+            Equipo de rescate confirmado disponible
+            <span>Módulo: Logística</span>
+          </div>
+          <span class="activity-time" id="time3">14:38</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-dot plan"></span>
+          <div class="activity-text">
+            Plan de acción inicial registrado
+            <span>Módulo: Planeación</span>
+          </div>
+          <span class="activity-time" id="time4">14:41</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acceso rápido al cierre -->
+    <div style="text-align:right; margin-top: var(--spacing-md);">
+      <a href="cierre.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:var(--radius-sm); border:1px solid var(--color-border); color:var(--color-text-muted); font-family:var(--font-display); font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; transition:all .2s;">
+        ✅ &nbsp;Proceder al Cierre del Incidente
+      </a>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <script>
+    /* ── Cronómetro del incidente ── */
+    const inicio = new Date();
+    inicio.setHours(14, 32, 0, 0);
+
+    function actualizarCronometro() {
+      const ahora     = new Date();
+      const diffMs    = ahora - inicio;
+      if (diffMs < 0) return;
+      const horas     = Math.floor(diffMs / 3600000);
+      const minutos   = Math.floor((diffMs % 3600000) / 60000);
+      const segundos  = Math.floor((diffMs % 60000) / 1000);
+      document.getElementById('tiempoTranscurrido').textContent =
+        String(horas).padStart(2,'0') + ':' +
+        String(minutos).padStart(2,'0') + ':' +
+        String(segundos).padStart(2,'0');
+    }
+
+    actualizarCronometro();
+    setInterval(actualizarCronometro, 1000);
+
+    /* ── Hover en enlace de cierre ── */
+    const cierreLink = document.querySelector('a[href="cierre.html"]');
+    if (cierreLink) {
+      cierreLink.addEventListener('mouseenter', () => {
+        cierreLink.style.borderColor = 'var(--color-green)';
+        cierreLink.style.color = 'var(--color-green)';
+      });
+      cierreLink.addEventListener('mouseleave', () => {
+        cierreLink.style.borderColor = '';
+        cierreLink.style.color = '';
+      });
+    }
+  </script>
+
+</body>
+</html>

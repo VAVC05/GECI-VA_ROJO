@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Cierre del Incidente</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+  <style>
+    /* ── Checklist de cierre ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: 10px var(--spacing-md);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+
+    .check-item:hover {
+      border-color: var(--color-border-light);
+    }
+
+    .check-item.checked {
+      border-color: var(--color-green);
+      background: rgba(39,201,122,0.08);
+    }
+
+    .check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-green);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .check-label {
+      font-size: 13px;
+      color: var(--color-text);
+      flex: 1;
+    }
+
+    .check-item.checked .check-label {
+      color: var(--color-green);
+    }
+
+    .check-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Progreso de cierre */
+    .cierre-progress {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .progress-bar-wrapper {
+      flex: 1;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .progress-label span:first-child {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .progress-pct {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-green);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--color-surface-2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-green));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-dim);
+      white-space: nowrap;
+    }
+
+    /* Alerta de cierre final */
+    .cierre-alert {
+      background: rgba(39,201,122,0.1);
+      border: 1px solid var(--color-green);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-lg);
+      display: none;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .cierre-alert.visible { display: flex; }
+
+    .cierre-alert-icon { font-size: 28px; }
+
+    .cierre-alert-text {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--color-green);
+    }
+
+    .cierre-alert-text span {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--color-text-muted);
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot alerta" id="statusDot"></span>
+      <span id="statusLabel">FASE DE CIERRE</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html" class="activo">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper">
+
+    <div class="page-header">
+      <h2><span class="highlight">Cierre</span> del Incidente</h2>
+      <p>Informe final, evaluación y validación del término de operaciones.</p>
+    </div>
+
+    <!-- Barra de progreso de cierre -->
+    <div class="cierre-progress">
+      <div class="progress-bar-wrapper">
+        <div class="progress-label">
+          <span>Checklist de cierre</span>
+          <span class="progress-pct" id="pctLabel">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <span class="progress-num" id="progressNum">0 / 6 completados</span>
+    </div>
+
+    <!-- Alerta de listo para cerrar -->
+    <div class="cierre-alert" id="cierreAlert">
+      <span class="cierre-alert-icon">✅</span>
+      <div class="cierre-alert-text">
+        Checklist completo — listo para validar el cierre
+        <span>Todos los puntos han sido confirmados. Complete el informe y firme el cierre.</span>
+      </div>
+    </div>
+
+    <form class="formulario" id="formCierre" novalidate>
+
+      <!-- CHECKLIST DE CIERRE -->
+      <fieldset class="seccion fade-up">
+        <legend>✅ &nbsp;Checklist de Cierre</legend>
+        <div class="checklist" id="checklist">
+
+          <label class="check-item" data-idx="0">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Incidente controlado / mitigado en su totalidad</span>
+            <span class="check-tag">Operaciones</span>
+          </label>
+
+          <label class="check-item" data-idx="1">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Recursos materiales y vehículos retirados o contabilizados</span>
+            <span class="check-tag">Logística</span>
+          </label>
+
+          <label class="check-item" data-idx="2">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Personal relevado y contabilizado sin novedades</span>
+            <span class="check-tag">Comando</span>
+          </label>
+
+          <label class="check-item" data-idx="3">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Bitácora completa y revisada</span>
+            <span class="check-tag">Planeación</span>
+          </label>
+
+          <label class="check-item" data-idx="4">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Área del incidente entregada a autoridad competente</span>
+            <span class="check-tag">Enlace</span>
+          </label>
+
+          <label class="check-item" data-idx="5">
+            <input type="checkbox" onchange="updateProgress()">
+            <span class="check-label">Informe preliminar elaborado y firmado</span>
+            <span class="check-tag">Comando</span>
+          </label>
+
+        </div>
+      </fieldset>
+
+      <!-- DATOS DE CIERRE -->
+      <fieldset class="seccion fade-up">
+        <legend>📋 &nbsp;Datos de Cierre</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Fecha de cierre</label>
+            <input type="date" name="fecha_cierre" id="fechaCierre" required>
+          </div>
+
+          <div class="campo">
+            <label class="required">Hora de cierre</label>
+            <input type="time" name="hora_cierre" id="horaCierre" required>
+          </div>
+
+          <div class="campo">
+            <label class="required">Tipo de cierre</label>
+            <select name="tipo_cierre" required>
+              <option value="">— Seleccionar —</option>
+              <option>Incidente controlado</option>
+              <option>Incidente mitigado</option>
+              <option>Incidente concluido</option>
+              <option>Transferido a otra autoridad</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Comandante del Incidente</label>
+            <input type="text" name="comandante" placeholder="Nombre del comandante">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- RESUMEN -->
+      <fieldset class="seccion fade-up">
+        <legend>📄 &nbsp;Resumen del Incidente</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label>Descripción general de la atención</label>
+            <textarea name="descripcion_general" placeholder="Resumen de las acciones realizadas, recursos empleados y resultado final..." style="height:120px;"></textarea>
+          </div>
+
+          <div class="campo">
+            <label>Personas atendidas / afectadas</label>
+            <input type="number" name="personas" min="0" placeholder="0">
+          </div>
+
+          <div class="campo">
+            <label>Daños materiales estimados</label>
+            <input type="text" name="danos" placeholder="Ej. Parciales, totales, sin daños">
+          </div>
+
+          <div class="campo campo-full">
+            <label>Daños y afectaciones detalle</label>
+            <textarea name="danos_detalle" placeholder="Descripción de daños materiales, humanos o ambientales..."></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- LECCIONES APRENDIDAS -->
+      <fieldset class="seccion fade-up">
+        <legend>🎓 &nbsp;Evaluación Final</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label>Lecciones aprendidas</label>
+            <textarea name="lecciones" placeholder="Aspectos positivos observados, áreas de oportunidad, coordinación entre unidades..."></textarea>
+          </div>
+
+          <div class="campo campo-full">
+            <label>Recomendaciones para futuros incidentes</label>
+            <textarea name="recomendaciones" placeholder="Acciones preventivas, necesidades de equipo, capacitación requerida..."></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- VALIDACIÓN Y FIRMA -->
+      <fieldset class="seccion fade-up">
+        <legend>🖊 &nbsp;Validación del Cierre</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Nombre del responsable que valida</label>
+            <input type="text" name="nombre_responsable" required placeholder="Nombre completo">
+          </div>
+
+          <div class="campo">
+            <label>Cargo</label>
+            <input type="text" name="cargo" placeholder="Ej. Coordinador de Protección Civil">
+          </div>
+
+          <div class="campo">
+            <label>Dependencia</label>
+            <select name="dependencia">
+              <option value="">— Seleccionar —</option>
+              <option>Protección Civil Metepec</option>
+              <option>Bomberos Metepec</option>
+              <option>SUEM</option>
+              <option>Dirección de Seguridad Pública</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Firma (nombre completo como constancia)</label>
+            <input type="text" name="firma" placeholder="Nombre de quien firma">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary" id="btnCerrar">✅ &nbsp;Cerrar Incidente</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Incidente cerrado
+      <span>El informe final fue registrado y el incidente fue cerrado.</span>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_CHECKS = 6;
+
+    /* Autocompletar fecha y hora */
+    const ahora = new Date();
+    document.getElementById('fechaCierre').value = ahora.toISOString().split('T')[0];
+    document.getElementById('horaCierre').value  = ahora.toTimeString().slice(0,5);
+
+    /* Progreso del checklist */
+    function updateProgress() {
+      const items     = document.querySelectorAll('.check-item');
+      const checked   = document.querySelectorAll('.check-item input:checked').length;
+      const pct       = Math.round((checked / TOTAL_CHECKS) * 100);
+
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('pctLabel').textContent     = pct + '%';
+      document.getElementById('progressNum').textContent  = checked + ' / ' + TOTAL_CHECKS + ' completados';
+
+      /* Marcar visualmente cada ítem */
+      items.forEach(item => {
+        item.classList.toggle('checked', item.querySelector('input').checked);
+      });
+
+      /* Mostrar alerta cuando todo esté completo */
+      document.getElementById('cierreAlert').classList.toggle('visible', checked === TOTAL_CHECKS);
+    }
+
+    /* Submit */
+    document.getElementById('formCierre').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+
+      /* Actualizar estado en header */
+      document.getElementById('statusDot').className = 'status-dot';
+      document.getElementById('statusLabel').textContent = 'INCIDENTE CERRADO';
+
+      setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 4000);
+    });
+  </script>
+
+</body>
+</html>

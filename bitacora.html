@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Bitácora del Incidente</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+  <style>
+    /* ── Timeline de bitácora ── */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+      margin-top: var(--spacing-lg);
+    }
+
+    /* Línea vertical del timeline */
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 14px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-border) 80%, transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: var(--spacing-lg);
+      animation: fadeUp 0.3s ease both;
+    }
+
+    /* Punto del timeline */
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 2px solid var(--color-bg);
+      box-shadow: 0 0 8px var(--color-primary);
+    }
+
+    .timeline-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md) var(--spacing-lg);
+      transition: border-color var(--transition);
+    }
+
+    .timeline-card:hover {
+      border-color: var(--color-border-light);
+    }
+
+    .timeline-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-hora {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+
+    .timeline-area {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .timeline-responsable {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+
+    .timeline-texto {
+      font-size: 14px;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .timeline-delete {
+      background: none;
+      border: none;
+      color: var(--color-text-dim);
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: auto;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: color var(--transition), background var(--transition);
+    }
+
+    .timeline-delete:hover {
+      color: var(--color-primary);
+      background: var(--color-primary-glow);
+    }
+
+    .timeline-empty {
+      text-align: center;
+      padding: var(--spacing-xl);
+      color: var(--color-text-dim);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .eventos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .eventos-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="bitacora.html" class="activo">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper">
+
+    <div class="page-header">
+      <h2><span class="highlight">Bitácora</span> del Incidente</h2>
+      <p>Registro cronológico de eventos, acciones y novedades durante la atención.</p>
+    </div>
+
+    <!-- FORMULARIO DE REGISTRO -->
+    <form class="formulario" id="formBitacora" novalidate>
+
+      <fieldset class="seccion fade-up">
+        <legend>📝 &nbsp;Nuevo Registro</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label>Fecha</label>
+            <input type="date" id="fecha">
+          </div>
+
+          <div class="campo">
+            <label>Hora del evento</label>
+            <input type="time" id="hora">
+          </div>
+
+          <div class="campo">
+            <label class="required">Área / Sección que reporta</label>
+            <select id="area" required>
+              <option value="">— Seleccionar —</option>
+              <option>Comando</option>
+              <option>Operaciones</option>
+              <option>Planeación</option>
+              <option>Logística</option>
+              <option>Seguridad</option>
+              <option>Enlace</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Responsable del registro</label>
+            <input type="text" id="responsable" placeholder="Nombre de quien reporta">
+          </div>
+
+          <div class="campo campo-full">
+            <label class="required">Descripción del evento</label>
+            <textarea id="descripcion" placeholder="Describa la actividad realizada, novedad u observación..." style="height:100px;" required></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">📝 &nbsp;Registrar Evento</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+
+    <!-- TIMELINE DE EVENTOS -->
+    <div style="margin-top: var(--spacing-xl);">
+      <div class="eventos-header">
+        <span class="eventos-title">📋 &nbsp;Registro de Eventos</span>
+        <span id="contadorEventos" class="badge badge-cerrado">0 eventos</span>
+      </div>
+
+      <div id="timelineContainer">
+        <div class="timeline-empty">No hay eventos registrados aún. Use el formulario para agregar el primer registro.</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">📝</span>
+    <div class="toast-text">
+      Evento registrado
+      <span>El evento fue añadido a la bitácora.</span>
+    </div>
+  </div>
+
+  <script>
+    const eventos = [];
+
+    /* Autocompletar fecha y hora */
+    const ahora = new Date();
+    document.getElementById('fecha').value = ahora.toISOString().split('T')[0];
+    document.getElementById('hora').value  = ahora.toTimeString().slice(0,5);
+
+    /* Colores por área */
+    const areaColors = {
+      'Comando':     'var(--color-primary)',
+      'Operaciones': 'var(--color-blue)',
+      'Planeación':  'var(--color-green)',
+      'Logística':   'var(--color-amber)',
+      'Seguridad':   '#9b59b6',
+      'Enlace':      '#1abc9c'
+    };
+
+    document.getElementById('formBitacora').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const area = document.getElementById('area').value;
+      const desc = document.getElementById('descripcion').value.trim();
+
+      if (!area || !desc) {
+        if (!area) markError('area');
+        if (!desc) markError('descripcion');
+        return;
+      }
+
+      eventos.unshift({   /* unshift para que el más reciente quede arriba */
+        fecha:       document.getElementById('fecha').value,
+        hora:        document.getElementById('hora').value,
+        area,
+        responsable: document.getElementById('responsable').value.trim() || 'No especificado',
+        desc
+      });
+
+      renderTimeline();
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3000);
+
+      this.reset();
+      const now2 = new Date();
+      document.getElementById('fecha').value = now2.toISOString().split('T')[0];
+      document.getElementById('hora').value  = now2.toTimeString().slice(0,5);
+    });
+
+    function renderTimeline() {
+      const container = document.getElementById('timelineContainer');
+      const contador  = document.getElementById('contadorEventos');
+
+      contador.textContent = eventos.length + ' evento' + (eventos.length !== 1 ? 's' : '');
+      contador.className   = eventos.length > 0 ? 'badge badge-alerta' : 'badge badge-cerrado';
+
+      if (eventos.length === 0) {
+        container.innerHTML = '<div class="timeline-empty">No hay eventos registrados aún.</div>';
+        return;
+      }
+
+      const color = (area) => areaColors[area] || 'var(--color-text-muted)';
+
+      container.innerHTML = `
+        <div class="timeline">
+          ${eventos.map((ev, i) => `
+            <div class="timeline-item" style="--delay:${i * 0.05}s">
+              <div class="timeline-card">
+                <div class="timeline-meta">
+                  <span class="timeline-hora">${ev.hora} hrs</span>
+                  <span class="timeline-area" style="border-color:${color(ev.area)};color:${color(ev.area)}">${ev.area}</span>
+                  <span class="timeline-responsable">${ev.responsable}</span>
+                  <button class="timeline-delete" onclick="eliminarEvento(${i})" title="Eliminar">✕</button>
+                </div>
+                <p class="timeline-texto">${ev.desc}</p>
+                <div style="margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--color-text-dim);">
+                  ${ev.fecha}
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    function eliminarEvento(idx) {
+      eventos.splice(idx, 1);
+      renderTimeline();
+    }
+
+    function markError(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--color-primary)';
+      el.style.boxShadow   = '0 0 0 3px var(--color-primary-glow)';
+      el.focus();
+      el.addEventListener('input', () => { el.style.borderColor=''; el.style.boxShadow=''; }, {once:true});
+    }
+  </script>
+
+</body>
+</html>

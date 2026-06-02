@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Planeación</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html" class="activo">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper">
+
+    <div class="page-header">
+      <h2><span class="highlight">Plan de Acción</span> del Incidente</h2>
+      <p>Defina objetivos, estrategia y medidas de seguridad para el periodo operativo.</p>
+    </div>
+
+    <form class="formulario" id="formPlan" novalidate>
+
+      <!-- PERIODO OPERATIVO -->
+      <fieldset class="seccion fade-up">
+        <legend>⏱ &nbsp;Periodo Operativo</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label>Hora de inicio del periodo</label>
+            <input type="time" name="inicio_periodo" id="inicio_periodo">
+          </div>
+          <div class="campo">
+            <label>Hora de término del periodo</label>
+            <input type="time" name="fin_periodo" id="fin_periodo">
+          </div>
+          <div class="campo">
+            <label>Número de periodo operativo</label>
+            <input type="number" name="num_periodo" min="1" value="1" placeholder="1">
+          </div>
+          <div class="campo">
+            <label>Fecha del Plan de Acción</label>
+            <input type="date" name="fecha_plan" id="fecha_plan">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- OBJETIVOS -->
+      <fieldset class="seccion fade-up">
+        <legend>🎯 &nbsp;Objetivos del Incidente</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label class="required">Objetivo general</label>
+            <textarea name="obj_general" placeholder="Describa el objetivo principal del periodo operativo..." required></textarea>
+          </div>
+
+          <div class="campo campo-full">
+            <label>Objetivos específicos</label>
+            <textarea name="obj_especificos" placeholder="1. Controlar el fuego en zona norte&#10;2. Evacuar a personas en riesgo&#10;3. ..."></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- PLAN DE ACCIÓN -->
+      <fieldset class="seccion fade-up">
+        <legend>📌 &nbsp;Plan de Acción</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Estrategia principal</label>
+            <select name="estrategia" required>
+              <option value="">— Seleccionar —</option>
+              <option>Contención</option>
+              <option>Evacuación</option>
+              <option>Control y extinción</option>
+              <option>Búsqueda y rescate</option>
+              <option>Atención médica</option>
+              <option>Mitigación</option>
+              <option>Combinada</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Táctica de apoyo</label>
+            <input type="text" placeholder="Ej. Ataque directo, ataque indirecto">
+          </div>
+
+          <div class="campo campo-full">
+            <label>Acciones a realizar</label>
+            <textarea name="acciones" placeholder="Detalle las acciones planificadas para este periodo..." style="height:120px;"></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- CONSIDERACIONES DE SEGURIDAD -->
+      <fieldset class="seccion fade-up">
+        <legend>🛡 &nbsp;Consideraciones de Seguridad</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label>Riesgos identificados</label>
+            <textarea name="riesgos" placeholder="Ej. Posible derrumbe en zona Este, fugas de gas, tráfico de vehículos..."></textarea>
+          </div>
+
+          <div class="campo campo-full">
+            <label>Medidas de prevención y EPP requerido</label>
+            <textarea name="medidas" placeholder="Ej. Uso obligatorio de casco y SCBA, perímetro de seguridad de 50m..."></textarea>
+          </div>
+
+          <div class="campo">
+            <label>Punto de reunión / Evacuación</label>
+            <input type="text" placeholder="Ej. Estacionamiento norte, Calle Hidalgo esq. Lerdo">
+          </div>
+
+          <div class="campo">
+            <label>Oficial de Seguridad asignado</label>
+            <input type="text" placeholder="Nombre del oficial">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- COMUNICACIONES -->
+      <fieldset class="seccion fade-up">
+        <legend>📡 &nbsp;Comunicaciones</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label>Canal de radio principal</label>
+            <input type="text" placeholder="Ej. Canal 3 — Operaciones">
+          </div>
+          <div class="campo">
+            <label>Canal de radio alterno</label>
+            <input type="text" placeholder="Ej. Canal 7 — Emergencia">
+          </div>
+          <div class="campo">
+            <label>Frecuencia / Red de datos</label>
+            <input type="text" placeholder="Ej. 155.340 MHz">
+          </div>
+          <div class="campo">
+            <label>Contacto de coordinación externa</label>
+            <input type="text" placeholder="Ej. CRUM, CAEM, CFE">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">📋 &nbsp;Guardar Plan de Acción</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Plan de acción guardado
+      <span>El plan operativo fue registrado correctamente.</span>
+    </div>
+  </div>
+
+  <script>
+    /* Autocompletar fecha */
+    document.getElementById('fecha_plan').value = new Date().toISOString().split('T')[0];
+
+    document.getElementById('formPlan').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3500);
+    });
+  </script>
+
+</body>
+</html>

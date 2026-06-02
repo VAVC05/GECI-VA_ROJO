@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Logística</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html" class="activo">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper" style="max-width:1100px;">
+
+    <div class="page-header">
+      <h2><span class="highlight">Sección de</span> Logística</h2>
+      <p>Registro y control de recursos materiales, vehículos y apoyo al personal.</p>
+    </div>
+
+    <form class="formulario" id="formLog" novalidate>
+
+      <!-- RECURSOS MATERIALES -->
+      <fieldset class="seccion fade-up">
+        <legend>🧰 &nbsp;Recurso Material / Vehículo</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Categoría</label>
+            <select id="categoria" required>
+              <option value="">— Seleccionar —</option>
+              <optgroup label="Equipo y materiales">
+                <option>Mangueras</option>
+                <option>Extintores</option>
+                <option>Equipo de rescate</option>
+                <option>EPP</option>
+                <option>Camillas / material médico</option>
+                <option>Herramienta manual</option>
+                <option>Otro material</option>
+              </optgroup>
+              <optgroup label="Vehículos">
+                <option>Autobomba</option>
+                <option>Ambulancia</option>
+                <option>Pipa de agua</option>
+                <option>Vehículo de mando</option>
+                <option>Otro vehículo</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label class="required">Descripción / Identificación</label>
+            <input type="text" id="descripcion" placeholder="Ej. Autobomba 01, Manguera 2½&quot; x 30m" required>
+          </div>
+
+          <div class="campo">
+            <label>Cantidad</label>
+            <input type="number" id="cantidad" min="1" value="1" placeholder="1">
+          </div>
+
+          <div class="campo">
+            <label>Estado</label>
+            <select id="estado">
+              <option value="Disponible">Disponible</option>
+              <option value="En uso">En uso</option>
+              <option value="Fuera de servicio">Fuera de servicio</option>
+              <option value="En tránsito">En tránsito</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Asignado a / Ubicación</label>
+            <input type="text" id="asignado" placeholder="Ej. Jefe de Operaciones, Zona Norte">
+          </div>
+
+          <div class="campo">
+            <label>Observaciones</label>
+            <input type="text" id="obsRecurso" placeholder="Notas adicionales">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- BOTONES DE RECURSO -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">📦 &nbsp;Agregar Recurso</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+      </div>
+
+    </form>
+
+    <!-- TABLA DE RECURSOS -->
+    <div class="tabla-wrapper" style="margin-top: var(--spacing-xl);">
+      <div class="tabla-header">
+        <h3>📦 &nbsp;Inventario de Recursos</h3>
+        <span id="contadorRec" class="badge badge-cerrado">0 registros</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Categoría</th>
+            <th>Descripción</th>
+            <th>Cant.</th>
+            <th>Estado</th>
+            <th>Asignado a</th>
+            <th>Observaciones</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody">
+          <tr><td colspan="8" class="tabla-empty">No hay recursos registrados aún.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- APOYO AL PERSONAL -->
+    <form class="formulario" id="formApoyo" style="margin-top: var(--spacing-xl);" novalidate>
+      <fieldset class="seccion fade-up">
+        <legend>🍽 &nbsp;Apoyo al Personal</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label>Tipo de apoyo</label>
+            <select name="tipoApoyo">
+              <option value="">— Seleccionar —</option>
+              <option>Alimentación</option>
+              <option>Hidratación</option>
+              <option>Área de descanso</option>
+              <option>Relevo de turno</option>
+              <option>Atención médica preventiva</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Número de personas beneficiadas</label>
+            <input type="number" min="0" name="personas" placeholder="0">
+          </div>
+          <div class="campo campo-full">
+            <label>Observaciones</label>
+            <textarea name="obsApoyo" placeholder="Detalles del apoyo brindado al personal..."></textarea>
+          </div>
+        </div>
+        <div class="acciones" style="margin-top:var(--spacing-md);">
+          <button type="submit" class="btn btn-primary">🍽 &nbsp;Guardar Apoyo</button>
+          <button type="reset"  class="btn btn-secondary">Limpiar</button>
+          <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+        </div>
+      </fieldset>
+    </form>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Guardado
+      <span>El registro fue agregado correctamente.</span>
+    </div>
+  </div>
+
+  <script>
+    const recursos = [];
+
+    document.getElementById('formLog').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const cat  = document.getElementById('categoria').value;
+      const desc = document.getElementById('descripcion').value.trim();
+
+      if (!cat || !desc) {
+        if (!cat)  markError('categoria');
+        if (!desc) markError('descripcion');
+        return;
+      }
+
+      recursos.push({
+        cat,
+        desc,
+        cantidad: document.getElementById('cantidad').value || '1',
+        estado:   document.getElementById('estado').value,
+        asignado: document.getElementById('asignado').value.trim() || '—',
+        obs:      document.getElementById('obsRecurso').value.trim() || '—'
+      });
+
+      renderTabla();
+      showToast('Recurso agregado', 'El inventario fue actualizado.');
+      this.reset();
+      document.getElementById('cantidad').value = 1;
+    });
+
+    document.getElementById('formApoyo').addEventListener('submit', function(e) {
+      e.preventDefault();
+      showToast('Apoyo registrado', 'El apoyo al personal fue guardado.');
+      this.reset();
+    });
+
+    function renderTabla() {
+      const tbody    = document.getElementById('tablaBody');
+      const contador = document.getElementById('contadorRec');
+
+      if (recursos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="tabla-empty">No hay recursos registrados aún.</td></tr>';
+        contador.textContent = '0 registros';
+        contador.className = 'badge badge-cerrado';
+        return;
+      }
+
+      contador.textContent = recursos.length + ' registro' + (recursos.length !== 1 ? 's' : '');
+      contador.className = 'badge badge-alerta';
+
+      tbody.innerHTML = recursos.map((r, i) => {
+        const estadoClass = r.estado === 'Disponible'     ? 'badge-activo'
+                          : r.estado === 'En uso'         ? 'badge-alerta'
+                          : r.estado === 'Fuera de servicio' ? 'badge-critico'
+                          : 'badge-cerrado';
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--color-text-dim);">${String(i+1).padStart(2,'0')}</td>
+            <td>${r.cat}</td>
+            <td>${r.desc}</td>
+            <td style="text-align:center;font-family:var(--font-mono);">${r.cantidad}</td>
+            <td><span class="badge ${estadoClass}">${r.estado}</span></td>
+            <td>${r.asignado}</td>
+            <td style="color:var(--color-text-muted);font-size:12px;">${r.obs}</td>
+            <td>
+              <button type="button" onclick="eliminar(${i})"
+                style="background:none;border:none;color:var(--color-text-dim);cursor:pointer;font-size:14px;"
+                title="Eliminar">✕</button>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function eliminar(idx) {
+      recursos.splice(idx, 1);
+      renderTabla();
+    }
+
+    function showToast(title, sub) {
+      const toast = document.getElementById('toast');
+      toast.querySelector('.toast-text').innerHTML = title + '<span>' + sub + '</span>';
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+
+    function markError(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--color-primary)';
+      el.style.boxShadow   = '0 0 0 3px var(--color-primary-glow)';
+      el.focus();
+      el.addEventListener('input', () => { el.style.borderColor=''; el.style.boxShadow=''; }, {once:true});
+    }
+  </script>
+
+</body>
+</html>

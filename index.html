@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Acceso al Sistema</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span>SISTEMA EN LÍNEA</span>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <main class="login-bg">
+    <div class="login-box">
+
+      <!-- Marca / logos -->
+      <div class="login-brand">
+        <div class="logos">
+          <img src="img/pc_metepec.png" alt="Protección Civil" style="height:48px;">
+          <img src="img/bomberos.png"   alt="Bomberos"         style="height:48px;">
+        </div>
+        <h2>GECI<span>-VA</span></h2>
+        <p>Coordinación de Protección Civil y Bomberos</p>
+      </div>
+
+      <div class="login-divider"><span>Acceso Autorizado</span></div>
+
+      <!-- Formulario -->
+      <form class="login-form" id="loginForm" novalidate>
+
+        <!-- Usuario -->
+        <div class="login-campo">
+          <label for="usuario">👤 &nbsp;Usuario</label>
+          <div class="login-input-wrapper">
+            <input type="text" id="usuario" name="usuario"
+                   placeholder="Ingrese su usuario"
+                   autocomplete="username" required>
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="login-campo">
+          <label for="password">🔒 &nbsp;Contraseña</label>
+          <div class="login-input-wrapper">
+            <input type="password" id="password" name="password"
+                   placeholder="••••••••"
+                   autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <!-- ── CAPTCHA MATEMÁTICO ── -->
+        <div class="login-campo">
+          <label>🤖 &nbsp;Verificación de seguridad</label>
+          <div class="captcha-box" id="captchaBox">
+
+            <!-- Imagen / pregunta del CAPTCHA -->
+            <div class="captcha-question">
+              <canvas id="captchaCanvas" width="200" height="54"
+                      title="CAPTCHA — texto distorsionado con la operación matemática"
+                      aria-label="Código de verificación visual"></canvas>
+              <button type="button" class="captcha-reload" id="btnReload"
+                      title="Generar nuevo código" aria-label="Recargar CAPTCHA">
+                ↻
+              </button>
+            </div>
+
+            <!-- Campo de respuesta -->
+            <div class="captcha-input-wrapper">
+              <input type="text" id="captchaInput" name="captcha"
+                     placeholder="Escriba el resultado"
+                     maxlength="4" autocomplete="off"
+                     inputmode="numeric" required>
+              <span class="captcha-hint">Resuelva la operación mostrada</span>
+            </div>
+
+            <!-- Indicador de estado -->
+            <div class="captcha-status" id="captchaStatus"></div>
+
+          </div>
+        </div>
+        <!-- ── FIN CAPTCHA ── -->
+
+        <button type="submit" class="btn-login" id="btnLogin">
+          Ingresar al Sistema
+        </button>
+
+      </form>
+
+      <!-- Contador de intentos fallidos -->
+      <p class="captcha-intentos" id="intentosMsg"></p>
+
+      <p class="login-note">
+        Acceso restringido a personal autorizado.<br>
+        Metepec, Estado de México.
+      </p>
+
+      <div class="version-tag">
+        <span>GECI-VA</span>
+        <span class="v-badge">v1.0</span>
+        <span>2025</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; Uso Interno
+  </footer>
+
+  <!-- ============================================================
+       SCRIPT — CAPTCHA + LOGIN
+  ============================================================ -->
+  <script>
+  (function () {
+
+    /* ── Configuración ── */
+    const MAX_INTENTOS   = 5;
+    const BLOQUEO_MS     = 30000;   // 30 segundos de bloqueo tras 5 intentos fallidos
+    let   respuestaCorrecta = 0;
+    let   intentosFallidos  = 0;
+    let   bloqueado         = false;
+
+    /* ── Referencias DOM ── */
+    const canvas      = document.getElementById('captchaCanvas');
+    const ctx         = canvas.getContext('2d');
+    const input       = document.getElementById('captchaInput');
+    const status      = document.getElementById('captchaStatus');
+    const intentosMsg = document.getElementById('intentosMsg');
+    const btnReload   = document.getElementById('btnReload');
+    const btnLogin    = document.getElementById('btnLogin');
+    const form        = document.getElementById('loginForm');
+
+    /* ──────────────────────────────────────────
+       GENERADOR DE CAPTCHA
+    ────────────────────────────────────────── */
+    function generarCaptcha() {
+      /* Operaciones posibles */
+      const ops = [
+        () => { const a = rnd(2,9), b = rnd(1,9); return { texto: `${a} + ${b} = ?`, res: a+b }; },
+        () => { const a = rnd(5,15),b = rnd(1,a); return { texto: `${a} − ${b} = ?`, res: a-b }; },
+        () => { const a = rnd(2,9), b = rnd(2,5); return { texto: `${a} × ${b} = ?`, res: a*b }; },
+      ];
+      const op = ops[Math.floor(Math.random() * ops.length)]();
+      respuestaCorrecta = op.res;
+      dibujarCanvas(op.texto);
+      input.value = '';
+      setCaptchaStatus('', '');
+    }
+
+    function rnd(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /* ──────────────────────────────────────────
+       DIBUJADOR DEL CANVAS
+    ────────────────────────────────────────── */
+    function dibujarCanvas(texto) {
+      const W = canvas.width;
+      const H = canvas.height;
+
+      /* Fondo */
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#1c2030';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Ruido de fondo — líneas aleatorias */
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(rnd(0, W), rnd(0, H));
+        ctx.lineTo(rnd(0, W), rnd(0, H));
+        ctx.strokeStyle = `rgba(${rnd(80,160)},${rnd(80,160)},${rnd(80,160)},0.35)`;
+        ctx.lineWidth   = rnd(1, 2);
+        ctx.stroke();
+      }
+
+      /* Puntos de ruido */
+      for (let i = 0; i < 60; i++) {
+        ctx.beginPath();
+        ctx.arc(rnd(0, W), rnd(0, H), rnd(1, 2), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rnd(80,200)},${rnd(80,200)},${rnd(80,200)},0.25)`;
+        ctx.fill();
+      }
+
+      /* Texto distorsionado — carácter por carácter */
+      const chars  = texto.split('');
+      const startX = 12;
+      let   curX   = startX;
+
+      chars.forEach((ch) => {
+        const angle    = (Math.random() - 0.5) * 0.45;   // ±~25°
+        const offsetY  = rnd(-4, 4);
+        const fontSize = rnd(22, 28);
+        const colors   = ['#e03030','#f5a623','#e8eaf0','#3d8ef0','#27c97a'];
+        const color    = colors[Math.floor(Math.random() * colors.length)];
+
+        ctx.save();
+        ctx.translate(curX + fontSize * 0.5, H / 2 + offsetY);
+        ctx.rotate(angle);
+        ctx.font        = `bold ${fontSize}px 'Rajdhani', 'Arial', sans-serif`;
+        ctx.fillStyle   = color;
+        ctx.textBaseline= 'middle';
+        ctx.textAlign   = 'center';
+
+        /* Sombra sutil para legibilidad */
+        ctx.shadowColor  = 'rgba(0,0,0,0.7)';
+        ctx.shadowBlur   = 3;
+        ctx.shadowOffsetX= 1;
+        ctx.shadowOffsetY= 1;
+
+        ctx.fillText(ch, 0, 0);
+        ctx.restore();
+
+        curX += fontSize * 0.72 + rnd(-2, 3);
+      });
+
+      /* Borde del canvas */
+      ctx.strokeStyle = '#272d3d';
+      ctx.lineWidth   = 1;
+      ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
+    }
+
+    /* ──────────────────────────────────────────
+       VALIDACIÓN EN TIEMPO REAL
+    ────────────────────────────────────────── */
+    input.addEventListener('input', function () {
+      const val = this.value.trim();
+      if (val === '') { setCaptchaStatus('', '');           return; }
+      if (parseInt(val, 10) === respuestaCorrecta) {
+        setCaptchaStatus('ok', '✓ Correcto');
+      } else {
+        setCaptchaStatus('error', '✗ Incorrecto');
+      }
+    });
+
+    /* ── Recargar ── */
+    btnReload.addEventListener('click', function () {
+      generarCaptcha();
+      input.focus();
+      /* Pequeña animación de rotación en el botón */
+      this.style.transform = 'rotate(360deg)';
+      setTimeout(() => { this.style.transform = ''; }, 300);
+    });
+
+    function setCaptchaStatus(tipo, mensaje) {
+      status.textContent  = mensaje;
+      status.className    = 'captcha-status ' + tipo;
+    }
+
+    /* ──────────────────────────────────────────
+       MANEJO DEL FORMULARIO
+    ────────────────────────────────────────── */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      if (bloqueado) return;
+
+      const usuario  = document.getElementById('usuario').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const captcha  = parseInt(input.value.trim(), 10);
+
+      /* Validar campos vacíos */
+      if (!usuario)  { resaltarError('usuario');  return; }
+      if (!password) { resaltarError('password'); return; }
+
+      /* Validar CAPTCHA */
+      if (isNaN(captcha) || captcha !== respuestaCorrecta) {
+        setCaptchaStatus('error', '✗ Código incorrecto — intente de nuevo');
+        resaltarError('captchaInput');
+        intentosFallidos++;
+        actualizarIntentos();
+        generarCaptcha();
+
+        if (intentosFallidos >= MAX_INTENTOS) {
+          bloquear();
+        }
+        return;
+      }
+
+      /* ── Todo correcto → ingresar ── */
+      btnLogin.textContent = 'Verificando...';
+      btnLogin.disabled    = true;
+      btnLogin.style.opacity = '0.7';
+      setCaptchaStatus('ok', '✓ Verificación superada');
+
+      setTimeout(() => {
+        // Credenciales de demostración
+        const USERS = [
+          { user: 'admin',    pass: 'GECI2025',  nombre: 'Administrador' },
+          { user: 'villanueva', pass: 'PC@metepec1', nombre: 'V. Villanueva' }
+        ];
+        const match = USERS.find(u => u.user === usuario && u.pass === password);
+        if (!match) {
+          resaltarError('usuario');
+          resaltarError('password');
+          btnLogin.disabled = false;
+          btnLogin.textContent = 'Ingresar al Sistema';
+          btnLogin.style.opacity = '1';
+          intentosFallidos++;
+          actualizarIntentos();
+          if (intentosFallidos >= MAX_INTENTOS) bloquear();
+          generarCaptcha();
+          return;
+        }
+        window.location.href = 'dashboard.html';
+      }, 900);
+    });
+
+    /* ──────────────────────────────────────────
+       CONTADOR DE INTENTOS Y BLOQUEO
+    ────────────────────────────────────────── */
+    function actualizarIntentos() {
+      const restantes = MAX_INTENTOS - intentosFallidos;
+      if (restantes > 0) {
+        intentosMsg.textContent = `⚠ ${intentosFallidos} intento(s) fallido(s) · ${restantes} restante(s)`;
+        intentosMsg.style.color = intentosFallidos >= 3
+          ? 'var(--color-primary)'
+          : 'var(--color-amber)';
+      }
+    }
+
+    function bloquear() {
+      bloqueado = true;
+      btnLogin.disabled   = true;
+      btnLogin.textContent= 'Sistema bloqueado';
+      btnLogin.style.opacity = '0.4';
+      intentosMsg.style.color = 'var(--color-primary)';
+
+      let seg = BLOQUEO_MS / 1000;
+      const tick = setInterval(() => {
+        intentosMsg.textContent = `🔒 Demasiados intentos. Espere ${seg}s para reintentar.`;
+        seg--;
+        if (seg < 0) {
+          clearInterval(tick);
+          desbloquear();
+        }
+      }, 1000);
+    }
+
+    function desbloquear() {
+      bloqueado         = false;
+      intentosFallidos  = 0;
+      btnLogin.disabled   = false;
+      btnLogin.textContent= 'Ingresar al Sistema';
+      btnLogin.style.opacity = '1';
+      intentosMsg.textContent = '';
+      generarCaptcha();
+    }
+
+    /* ──────────────────────────────────────────
+       FUNCIÓN DE ERROR VISUAL
+    ────────────────────────────────────────── */
+    function resaltarError(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.borderColor = 'var(--color-primary)';
+      el.style.boxShadow   = '0 0 0 3px var(--color-primary-glow)';
+      el.focus();
+      el.addEventListener('input', function clear() {
+        el.style.borderColor = '';
+        el.style.boxShadow   = '';
+        el.removeEventListener('input', clear);
+      });
+    }
+
+    /* ── Inicializar el CAPTCHA al cargar ── */
+    generarCaptcha();
+
+  })();
+  </script>
+
+</body>
+</html>

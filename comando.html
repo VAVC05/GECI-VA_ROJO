@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Comando de Incidentes</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+  <style>
+    /* ── Organigrama visual ── */
+    .org-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin: var(--spacing-lg) 0;
+    }
+
+    /* Nodo */
+    .org-node {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px 20px;
+      min-width: 200px;
+      text-align: center;
+      position: relative;
+      transition: border-color var(--transition);
+    }
+
+    .org-node:hover { border-color: var(--color-primary); }
+
+    .org-node.top {
+      border-color: var(--color-primary);
+      background: var(--color-primary-glow);
+    }
+
+    .org-node-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      margin-bottom: 4px;
+    }
+
+    .org-node-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text);
+      min-height: 20px;
+    }
+
+    /* Línea vertical */
+    .org-vline {
+      width: 2px;
+      height: 30px;
+      background: var(--color-border);
+      flex-shrink: 0;
+    }
+
+    /* Fila horizontal de hijos */
+    .org-row {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: flex-start;
+      position: relative;
+    }
+
+    /* Línea horizontal que une nodos */
+    .org-hline {
+      position: absolute;
+      top: 0;
+      left: 0; right: 0;
+      height: 2px;
+      background: var(--color-border);
+    }
+
+    .org-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .org-col .org-vline-top {
+      width: 2px;
+      height: 30px;
+      background: var(--color-border);
+    }
+
+    /* Staff lateral */
+    .staff-row {
+      display: flex;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .staff-card {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      min-width: 160px;
+      text-align: center;
+      transition: border-color var(--transition);
+    }
+
+    .staff-card:hover { border-color: var(--color-border-light); }
+
+    .staff-role {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      margin-bottom: 6px;
+    }
+
+    /* Secciones del SCI */
+    .sci-sections {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .sci-section-card {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      text-align: center;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .sci-section-card:hover {
+      border-color: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .sci-section-icon { font-size: 24px; margin-bottom: 6px; }
+
+    .sci-section-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .sci-sections { grid-template-columns: 1fr 1fr; }
+      .org-row { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html" class="activo">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper">
+
+    <div class="page-header">
+      <h2><span class="highlight">Estructura</span> del Comando</h2>
+      <p>Sistema de Comando de Incidentes (SCI) — Asigne los responsables de cada función.</p>
+    </div>
+
+    <form class="formulario" id="formComando" novalidate>
+
+      <!-- COMANDANTE -->
+      <fieldset class="seccion fade-up">
+        <legend>🎖 &nbsp;Comandante del Incidente</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label class="required">Nombre completo</label>
+            <input type="text" name="cmd_nombre" id="cmd_nombre" placeholder="Nombre del comandante" required>
+          </div>
+          <div class="campo">
+            <label>Cargo / Rango</label>
+            <input type="text" name="cmd_cargo" placeholder="Ej. Capitán, Coordinador">
+          </div>
+          <div class="campo">
+            <label>Dependencia</label>
+            <select name="cmd_dep">
+              <option value="">— Seleccionar —</option>
+              <option>Protección Civil Metepec</option>
+              <option>Bomberos Metepec</option>
+              <option>SUEM</option>
+              <option>Policía Municipal</option>
+              <option>Otra</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Radio / Contacto</label>
+            <input type="text" placeholder="Canal o número de contacto">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ORGANIGRAMA VISUAL (decorativo / dinámico) -->
+      <fieldset class="seccion fade-up">
+        <legend>📊 &nbsp;Organigrama SCI</legend>
+
+        <div class="org-chart">
+          <!-- Comandante -->
+          <div class="org-node top">
+            <div class="org-node-title">Comandante del Incidente</div>
+            <div class="org-node-name" id="org-cmd">—</div>
+          </div>
+
+          <div class="org-vline"></div>
+
+          <!-- Staff -->
+          <div class="staff-row">
+            <div class="staff-card">
+              <div class="staff-role">Seg. Oficial</div>
+              <div class="org-node-name" id="org-seg" style="font-size:12px;">—</div>
+            </div>
+            <div class="staff-card">
+              <div class="staff-role">Enlace</div>
+              <div class="org-node-name" id="org-enlace" style="font-size:12px;">—</div>
+            </div>
+            <div class="staff-card">
+              <div class="staff-role">Info Pública</div>
+              <div class="org-node-name" id="org-info" style="font-size:12px;">—</div>
+            </div>
+          </div>
+
+          <div class="org-vline"></div>
+
+          <!-- Secciones -->
+          <div class="sci-sections">
+            <div class="sci-section-card">
+              <div class="sci-section-icon">⚙️</div>
+              <div class="sci-section-name">Operaciones</div>
+              <div class="org-node-name" id="org-ops" style="font-size:12px; font-family:var(--font-body);">—</div>
+            </div>
+            <div class="sci-section-card">
+              <div class="sci-section-icon">📋</div>
+              <div class="sci-section-name">Planeación</div>
+              <div class="org-node-name" id="org-plan" style="font-size:12px; font-family:var(--font-body);">—</div>
+            </div>
+            <div class="sci-section-card">
+              <div class="sci-section-icon">📦</div>
+              <div class="sci-section-name">Logística</div>
+              <div class="org-node-name" id="org-log" style="font-size:12px; font-family:var(--font-body);">—</div>
+            </div>
+            <div class="sci-section-card">
+              <div class="sci-section-icon">💰</div>
+              <div class="sci-section-name">Finanzas</div>
+              <div class="org-node-name" id="org-fin" style="font-size:12px; font-family:var(--font-body);">—</div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- STAFF DEL COMANDO -->
+      <fieldset class="seccion fade-up">
+        <legend>👥 &nbsp;Staff del Comando</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label>Oficial de Seguridad</label>
+            <input type="text" name="seg_oficial" id="seg_oficial" placeholder="Nombre">
+          </div>
+          <div class="campo">
+            <label>Oficial de Enlace</label>
+            <input type="text" name="enlace" id="enlace" placeholder="Nombre">
+          </div>
+          <div class="campo">
+            <label>Información Pública</label>
+            <input type="text" name="info_publica" id="info_publica" placeholder="Nombre">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- SECCIONES DEL SCI -->
+      <fieldset class="seccion fade-up">
+        <legend>🏛 &nbsp;Jefes de Sección SCI</legend>
+        <div class="campos-grid">
+          <div class="campo">
+            <label>Jefe de Operaciones</label>
+            <input type="text" name="jefe_ops" id="jefe_ops" placeholder="Nombre">
+          </div>
+          <div class="campo">
+            <label>Jefe de Planeación</label>
+            <input type="text" name="jefe_plan" id="jefe_plan" placeholder="Nombre">
+          </div>
+          <div class="campo">
+            <label>Jefe de Logística</label>
+            <input type="text" name="jefe_log" id="jefe_log" placeholder="Nombre">
+          </div>
+          <div class="campo">
+            <label>Jefe de Finanzas / Administración</label>
+            <input type="text" name="jefe_fin" id="jefe_fin" placeholder="Nombre">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">🎖 &nbsp;Guardar Comando</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Comando guardado
+      <span>La estructura del SCI ha sido registrada.</span>
+    </div>
+  </div>
+
+  <script>
+    /* Actualizar organigrama en tiempo real */
+    const mapeo = {
+      'cmd_nombre':  'org-cmd',
+      'seg_oficial': 'org-seg',
+      'enlace':      'org-enlace',
+      'info_publica':'org-info',
+      'jefe_ops':    'org-ops',
+      'jefe_plan':   'org-plan',
+      'jefe_log':    'org-log',
+      'jefe_fin':    'org-fin'
+    };
+
+    Object.entries(mapeo).forEach(([inputId, orgId]) => {
+      const input = document.getElementById(inputId);
+      const orgEl = document.getElementById(orgId);
+      if (!input || !orgEl) return;
+      input.addEventListener('input', () => {
+        orgEl.textContent = input.value.trim() || '—';
+      });
+    });
+
+    /* Submit */
+    document.getElementById('formComando').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3500);
+    });
+  </script>
+
+</body>
+</html>

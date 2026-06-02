@@ -1,0 +1,234 @@
+/* ===== LOGIN ===== */
+.login-bg {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background-color: #f2f2f2;
+}
+
+.login-box {
+    background-color: #ffffff;
+    width: 380px;
+    padding: 32px 36px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    border: 1px solid #ddd;
+}
+
+.login-brand {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.login-brand .logos {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.login-brand h2 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #b30000;
+    letter-spacing: 2px;
+}
+
+.login-brand p {
+    font-size: 11px;
+    color: #888;
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+}
+
+.login-divider {
+    height: 1px;
+    background: #eee;
+    margin: 0 0 20px;
+    position: relative;
+}
+
+.login-divider span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 0 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #aaa;
+}
+
+/* ===== CAMPOS ===== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.login-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.login-campo label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+.login-campo input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-campo input:focus {
+    border-color: #b30000;
+    box-shadow: 0 0 0 2px rgba(179,0,0,0.1);
+}
+
+/* ===== CAPTCHA ===== */
+.captcha-box {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.captcha-question {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#captchaCanvas {
+    border-radius: 3px;
+    flex: 1;
+    max-width: 210px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.captcha-reload {
+    width: 34px; height: 34px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.captcha-reload:hover { border-color: #b30000; color: #b30000; }
+
+.captcha-input-wrapper { display: flex; flex-direction: column; gap: 3px; }
+
+.captcha-input-wrapper input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    text-align: center;
+    letter-spacing: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.captcha-input-wrapper input:focus {
+    border-color: #b30000;
+    box-shadow: 0 0 0 2px rgba(179,0,0,0.1);
+}
+
+.captcha-hint {
+    font-size: 10px;
+    color: #aaa;
+    text-align: center;
+}
+
+.captcha-status {
+    font-size: 11px;
+    text-align: center;
+    min-height: 15px;
+}
+
+.captcha-status.ok    { color: #388e3c; }
+.captcha-status.error { color: #b30000; }
+
+.captcha-intentos {
+    font-size: 11px;
+    text-align: center;
+    min-height: 16px;
+    margin-top: 4px;
+}
+
+/* ===== BOTÓN DE LOGIN ===== */
+.btn-login {
+    width: 100%;
+    padding: 10px;
+    background-color: #b30000;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.btn-login:hover { background-color: #8a0000; }
+
+/* ===== NOTA Y VERSIÓN ===== */
+.login-note {
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 16px;
+    line-height: 1.5;
+}
+
+.version-tag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.version-tag span {
+    font-size: 10px;
+    color: #bbb;
+    font-family: monospace;
+}
+
+.v-badge {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 1px 6px;
+    color: #999 !important;
+}

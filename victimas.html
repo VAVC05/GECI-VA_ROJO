@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Registro de Víctimas</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+  <style>
+    /* ── Tarjetas de estadísticas de triage ── */
+    .triage-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .triage-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      text-align: center;
+      transition: border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .triage-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .triage-card.negro  ::before,
+    .triage-card.negro  { border-top: 3px solid #555; }
+    .triage-card.rojo   { border-top: 3px solid var(--color-primary); }
+    .triage-card.amarillo { border-top: 3px solid var(--color-amber); }
+    .triage-card.verde  { border-top: 3px solid var(--color-green); }
+    .triage-card.blanco { border-top: 3px solid #aaa; }
+
+    .triage-num {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      margin: 6px 0 4px;
+    }
+
+    .triage-card.negro   .triage-num { color: #888; }
+    .triage-card.rojo    .triage-num { color: var(--color-primary); }
+    .triage-card.amarillo .triage-num { color: var(--color-amber); }
+    .triage-card.verde   .triage-num { color: var(--color-green); }
+    .triage-card.blanco  .triage-num { color: #bbb; }
+
+    .triage-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+    }
+
+    .triage-desc {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Badges de triage en tabla ── */
+    .t-negro    { background:rgba(100,100,100,.2); color:#999;                     border:1px solid #555; }
+    .t-rojo     { background:rgba(224,48,48,.15);  color:var(--color-primary);     border:1px solid rgba(224,48,48,.4); }
+    .t-amarillo { background:rgba(245,166,35,.15); color:var(--color-amber);       border:1px solid rgba(245,166,35,.4); }
+    .t-verde    { background:rgba(39,201,122,.15); color:var(--color-green);       border:1px solid rgba(39,201,122,.4); }
+    .t-blanco   { background:rgba(200,200,200,.1); color:#bbb;                     border:1px solid #555; }
+
+    /* ── Ficha de víctima (tarjeta expandible en tabla) ── */
+    .ficha-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font-mono);
+    }
+    .ficha-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    @media (max-width: 900px) {
+      .triage-stats { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .triage-stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html" class="activo">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper" style="max-width:1100px;">
+
+    <div class="page-header">
+      <h2><span class="highlight">Registro de</span> Víctimas</h2>
+      <p>Control de personas afectadas, clasificación por triage START y seguimiento de traslados.</p>
+    </div>
+
+    <!-- ── ESTADÍSTICAS DE TRIAGE ── -->
+    <div class="triage-stats">
+      <div class="triage-card negro">
+        <div class="triage-label">⬛ Negro</div>
+        <div class="triage-num" id="cnt-negro">0</div>
+        <div class="triage-desc">Sin signos vitales / fallecido</div>
+      </div>
+      <div class="triage-card rojo">
+        <div class="triage-label">🔴 Rojo</div>
+        <div class="triage-num" id="cnt-rojo">0</div>
+        <div class="triage-desc">Crítico — atención inmediata</div>
+      </div>
+      <div class="triage-card amarillo">
+        <div class="triage-label">🟡 Amarillo</div>
+        <div class="triage-num" id="cnt-amarillo">0</div>
+        <div class="triage-desc">Urgente — puede esperar</div>
+      </div>
+      <div class="triage-card verde">
+        <div class="triage-label">🟢 Verde</div>
+        <div class="triage-num" id="cnt-verde">0</div>
+        <div class="triage-desc">Leve — ambulatorio</div>
+      </div>
+      <div class="triage-card blanco">
+        <div class="triage-label">⬜ Blanco</div>
+        <div class="triage-num" id="cnt-blanco">0</div>
+        <div class="triage-desc">Sin lesiones / ileso</div>
+      </div>
+    </div>
+
+    <!-- ── FORMULARIO DE REGISTRO ── -->
+    <form class="formulario" id="formVictimas" novalidate>
+
+      <!-- Datos de identificación -->
+      <fieldset class="seccion fade-up">
+        <legend>👤 &nbsp;Datos de la Persona</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label>Folio de víctima</label>
+            <input type="text" id="folioVic" placeholder="Ej. VIC-001" readonly
+                   style="font-family:var(--font-mono); color:var(--color-primary); cursor:default;">
+          </div>
+
+          <div class="campo">
+            <label>Hora de registro</label>
+            <input type="time" id="horaVic">
+          </div>
+
+          <div class="campo">
+            <label>Nombre completo</label>
+            <input type="text" id="nombre" placeholder="Nombre(s) y apellidos (si se conoce)">
+          </div>
+
+          <div class="campo">
+            <label>Edad aproximada</label>
+            <input type="number" id="edad" min="0" max="120" placeholder="Años">
+          </div>
+
+          <div class="campo">
+            <label>Sexo</label>
+            <select id="sexo">
+              <option value="">— Seleccionar —</option>
+              <option>Masculino</option>
+              <option>Femenino</option>
+              <option>No determinado</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Identificación oficial</label>
+            <input type="text" placeholder="INE, pasaporte, otro (si disponible)">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- Clasificación triage -->
+      <fieldset class="seccion fade-up">
+        <legend>🏥 &nbsp;Clasificación Triage START</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label class="required">Color de triage</label>
+            <div class="nivel-selector" style="grid-template-columns: repeat(5,1fr);">
+
+              <div class="nivel-option" style="--c:#555;">
+                <input type="radio" name="triage" id="t-negro" value="negro">
+                <label for="t-negro" style="border-color:#444;">
+                  <span class="nivel-icon">⬛</span>
+                  Negro
+                  <span class="nivel-num">Fallecido</span>
+                </label>
+              </div>
+
+              <div class="nivel-option alto">
+                <input type="radio" name="triage" id="t-rojo" value="rojo" checked>
+                <label for="t-rojo">
+                  <span class="nivel-icon">🔴</span>
+                  Rojo
+                  <span class="nivel-num">Crítico</span>
+                </label>
+              </div>
+
+              <div class="nivel-option medio">
+                <input type="radio" name="triage" id="t-amarillo" value="amarillo">
+                <label for="t-amarillo">
+                  <span class="nivel-icon">🟡</span>
+                  Amarillo
+                  <span class="nivel-num">Urgente</span>
+                </label>
+              </div>
+
+              <div class="nivel-option bajo">
+                <input type="radio" name="triage" id="t-verde" value="verde">
+                <label for="t-verde">
+                  <span class="nivel-icon">🟢</span>
+                  Verde
+                  <span class="nivel-num">Leve</span>
+                </label>
+              </div>
+
+              <div class="nivel-option" style="--c:#aaa;">
+                <input type="radio" name="triage" id="t-blanco" value="blanco">
+                <label for="t-blanco" style="border-color:#444;">
+                  <span class="nivel-icon">⬜</span>
+                  Blanco
+                  <span class="nivel-num">Ileso</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Tipo de lesión principal</label>
+            <select id="lesion">
+              <option value="">— Seleccionar —</option>
+              <optgroup label="Traumatismo">
+                <option>Traumatismo craneoencefálico</option>
+                <option>Fractura</option>
+                <option>Herida abierta</option>
+                <option>Contusión / golpe</option>
+                <option>Aplastamiento</option>
+              </optgroup>
+              <optgroup label="Quemaduras">
+                <option>Quemadura 1° grado</option>
+                <option>Quemadura 2° grado</option>
+                <option>Quemadura 3° grado</option>
+              </optgroup>
+              <optgroup label="Intoxicación">
+                <option>Intoxicación por humo</option>
+                <option>Intoxicación por gas</option>
+              </optgroup>
+              <optgroup label="Otro">
+                <option>Paro cardiorrespiratorio</option>
+                <option>Shock</option>
+                <option>Sin lesión visible</option>
+                <option>Otro</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Área corporal afectada</label>
+            <input type="text" id="areaCuerpo" placeholder="Ej. Tórax, miembro inferior izquierdo">
+          </div>
+
+          <div class="campo campo-full">
+            <label>Descripción de lesiones / estado clínico</label>
+            <textarea id="descLesion" placeholder="Describa el estado clínico observado, signos vitales si se tomaron, etc."></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- Atención y traslado -->
+      <fieldset class="seccion fade-up">
+        <legend>🚑 &nbsp;Atención y Traslado</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label>Estado de atención</label>
+            <select id="estadoAten">
+              <option value="En escena">En escena</option>
+              <option value="Siendo atendido">Siendo atendido</option>
+              <option value="Trasladado">Trasladado</option>
+              <option value="Alta en escena">Alta en escena</option>
+              <option value="Fallecido en escena">Fallecido en escena</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Unidad que atiende</label>
+            <input type="text" id="unidadAten" placeholder="Ej. Ambulancia 02, Paramédicos PC">
+          </div>
+
+          <div class="campo">
+            <label>Hospital / Destino de traslado</label>
+            <input type="text" id="hospital" placeholder="Ej. IMSS UMF-220, ISSEMYM Metepec">
+          </div>
+
+          <div class="campo">
+            <label>Hora de traslado</label>
+            <input type="time" id="horaTraslado">
+          </div>
+
+          <div class="campo campo-full">
+            <label>Observaciones adicionales</label>
+            <textarea id="obsVic" placeholder="Alergias conocidas, medicamentos, familiares presentes, datos de contacto de familiar..."></textarea>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- Botones -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">🩺 &nbsp;Registrar Víctima</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+
+    <!-- ── TABLA DE VÍCTIMAS REGISTRADAS ── -->
+    <div class="tabla-wrapper" style="margin-top:var(--spacing-xl);">
+      <div class="tabla-header">
+        <h3>🩺 &nbsp;Víctimas Registradas</h3>
+        <span id="totalVic" class="badge badge-cerrado">0 personas</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Folio</th>
+            <th>Hora</th>
+            <th>Nombre</th>
+            <th>Edad</th>
+            <th>Sexo</th>
+            <th>Triage</th>
+            <th>Lesión</th>
+            <th>Estado</th>
+            <th>Unidad</th>
+            <th>Hospital</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaVic">
+          <tr><td colspan="11" class="tabla-empty">No hay víctimas registradas aún.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">🩺</span>
+    <div class="toast-text" id="toastText">
+      Víctima registrada
+      <span>El registro fue agregado correctamente.</span>
+    </div>
+  </div>
+
+  <script>
+    const victimas = [];
+    let   folioNum = 1;
+
+    /* ── Inicializar hora y folio ── */
+    function initForm() {
+      const n = new Date();
+      document.getElementById('horaVic').value = n.toTimeString().slice(0,5);
+      document.getElementById('folioVic').value = 'VIC-' + String(folioNum).padStart(3,'0');
+    }
+    initForm();
+
+    /* ── Submit ── */
+    document.getElementById('formVictimas').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const triage = document.querySelector('input[name="triage"]:checked')?.value || 'rojo';
+
+      const v = {
+        folio:       'VIC-' + String(folioNum).padStart(3,'0'),
+        hora:        document.getElementById('horaVic').value,
+        nombre:      document.getElementById('nombre').value.trim() || 'No identificado',
+        edad:        document.getElementById('edad').value || '—',
+        sexo:        document.getElementById('sexo').value || '—',
+        triage,
+        lesion:      document.getElementById('lesion').value || '—',
+        descLesion:  document.getElementById('descLesion').value.trim(),
+        estado:      document.getElementById('estadoAten').value,
+        unidad:      document.getElementById('unidadAten').value.trim() || '—',
+        hospital:    document.getElementById('hospital').value.trim() || '—',
+        horaTraslado:document.getElementById('horaTraslado').value || '—',
+        obs:         document.getElementById('obsVic').value.trim()
+      };
+
+      victimas.push(v);
+      folioNum++;
+
+      renderTabla();
+      actualizarStats();
+      showToast(v.triage);
+
+      this.reset();
+      initForm();
+    });
+
+    /* ── Render tabla ── */
+    function renderTabla() {
+      const tbody = document.getElementById('tablaVic');
+      const total = document.getElementById('totalVic');
+
+      total.textContent = victimas.length + ' persona' + (victimas.length !== 1 ? 's' : '');
+      total.className   = victimas.length > 0 ? 'badge badge-alerta' : 'badge badge-cerrado';
+
+      if (victimas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="tabla-empty">No hay víctimas registradas aún.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = victimas.map((v, i) => {
+        const tClass = 't-' + v.triage;
+        const tLabel = { negro:'⬛ Negro', rojo:'🔴 Rojo', amarillo:'🟡 Amarillo', verde:'🟢 Verde', blanco:'⬜ Blanco' }[v.triage];
+        const eClass = v.estado === 'Trasladado'          ? 'badge-activo'
+                     : v.estado === 'Siendo atendido'     ? 'badge-alerta'
+                     : v.estado === 'Fallecido en escena' ? 'badge-critico'
+                     : 'badge-cerrado';
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--color-primary);font-size:12px;">${v.folio}</td>
+            <td style="font-family:var(--font-mono);font-size:11px;">${v.hora}</td>
+            <td>${v.nombre}</td>
+            <td style="text-align:center;">${v.edad}</td>
+            <td style="font-size:12px;">${v.sexo}</td>
+            <td><span class="badge ${tClass}">${tLabel}</span></td>
+            <td style="font-size:12px;">${v.lesion}</td>
+            <td><span class="badge ${eClass}">${v.estado}</span></td>
+            <td style="font-size:12px;">${v.unidad}</td>
+            <td style="font-size:12px;">${v.hospital}</td>
+            <td>
+              <button type="button" onclick="eliminarVic(${i})"
+                style="background:none;border:none;color:var(--color-text-dim);cursor:pointer;font-size:14px;"
+                title="Eliminar">✕</button>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    /* ── Actualizar contadores de triage ── */
+    function actualizarStats() {
+      ['negro','rojo','amarillo','verde','blanco'].forEach(color => {
+        const n = victimas.filter(v => v.triage === color).length;
+        document.getElementById('cnt-' + color).textContent = n;
+      });
+    }
+
+    /* ── Eliminar ── */
+    function eliminarVic(idx) {
+      victimas.splice(idx, 1);
+      renderTabla();
+      actualizarStats();
+    }
+
+    /* ── Toast ── */
+    function showToast(triage) {
+      const labels = {
+        negro:'⬛ Fallecido — Negro', rojo:'🔴 Triage Rojo — Crítico',
+        amarillo:'🟡 Triage Amarillo — Urgente', verde:'🟢 Triage Verde — Leve', blanco:'⬜ Sin lesiones — Blanco'
+      };
+      const toast = document.getElementById('toast');
+      toast.querySelector('.toast-text').innerHTML =
+        'Víctima registrada<span>' + labels[triage] + '</span>';
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3200);
+    }
+  </script>
+
+</body>
+</html>

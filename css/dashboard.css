@@ -1,0 +1,203 @@
+/* ===== DASHBOARD ===== */
+.dashboard-wrapper {
+    padding: 24px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Fila superior de métricas */
+.dashboard-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+/* Tarjeta genérica */
+.card {
+    background-color: #ffffff;
+    padding: 18px 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    border: 1px solid #ddd;
+}
+
+.card h2 {
+    color: #b30000;
+    font-size: 15px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Incidente activo */
+.incident-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.incident-folio {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.incident-folio span {
+    display: block;
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+    font-weight: normal;
+}
+
+.incident-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin-top: 10px;
+}
+
+.incident-field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.incident-field p {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Métricas */
+.card-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #b30000;
+    line-height: 1;
+    margin: 4px 0;
+}
+
+.metric-label  { font-size: 12px; color: #666; }
+.metric-trend  { font-size: 11px; color: #999; margin-top: 4px; }
+
+/* Módulos */
+.modules-section { margin-bottom: 28px; }
+
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #b30000;
+    display: inline-block;
+}
+
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.module-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-decoration: none;
+    color: #333;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.module-card:hover {
+    border-color: #b30000;
+    box-shadow: 0 2px 8px rgba(179,0,0,0.1);
+}
+
+.module-icon { font-size: 22px; }
+
+.module-name {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #b30000;
+}
+
+.module-desc  { font-size: 11px; color: #777; line-height: 1.4; }
+.module-num   { font-size: 10px; color: #bbb; text-align: right; }
+.module-arrow { font-size: 14px; color: #b30000; margin-top: auto; opacity: 0; transition: opacity 0.2s; }
+
+.module-card:hover .module-arrow { opacity: 1; }
+
+/* Actividad reciente */
+.activity-section  { margin-bottom: 20px; }
+
+.activity-list {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.activity-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: #fafafa; }
+
+.activity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.activity-dot.ops  { background: #1976d2; }
+.activity-dot.cmd  { background: #b30000; }
+.activity-dot.log  { background: #f57c00; }
+.activity-dot.plan { background: #388e3c; }
+
+.activity-text       { font-size: 12px; color: #333; }
+.activity-text span  { font-size: 11px; color: #888; display: block; }
+.activity-time       { font-size: 11px; color: #aaa; white-space: nowrap; font-family: monospace; }
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    .dashboard-top    { grid-template-columns: 1fr 1fr; }
+    .modules-grid     { grid-template-columns: repeat(3,1fr); }
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper { padding: 16px; }
+    .dashboard-top    { grid-template-columns: 1fr; }
+    .modules-grid     { grid-template-columns: 1fr 1fr; }
+    .incident-grid    { grid-template-columns: 1fr; }
+}

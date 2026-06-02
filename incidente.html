@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GECI-VA | Registro de Incidente</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/formularios.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logos">
+      <img src="img/pc_metepec.png" alt="Protección Civil Metepec">
+      <img src="img/bomberos.png"   alt="Bomberos Metepec">
+    </div>
+    <div class="header-text">
+      <h1>GECI-VA</h1>
+      <p>Sistema de Gestión del Comando de Incidentes</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot critico"></span>
+      <span>INCIDENTE ACTIVO</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="incidente.html" class="activo">🚨 Incidente</a>
+    <a href="comando.html">🎖 Comando</a>
+    <a href="operaciones.html">⚙️ Operaciones</a>
+    <a href="planeacion.html">📋 Planeación</a>
+    <a href="logistica.html">📦 Logística</a>
+    <a href="victimas.html">🩺 Víctimas</a>
+    <a href="bitacora.html">📝 Bitácora</a>
+    <a href="cierre.html">✅ Cierre</a>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="page-wrapper">
+
+    <div class="page-header">
+      <h2><span class="highlight">Registro</span> del Incidente</h2>
+      <p>Capture los datos iniciales del evento de emergencia.</p>
+    </div>
+
+    <form class="formulario" id="formIncidente" novalidate>
+
+      <!-- SECCIÓN 1: Clasificación -->
+      <fieldset class="seccion fade-up">
+        <legend>📋 &nbsp;Clasificación del Incidente</legend>
+        <div class="campos-grid">
+
+          <div class="campo">
+            <label class="required">Tipo de incidente</label>
+            <select name="tipo" id="tipo" required>
+              <option value="">— Seleccionar —</option>
+              <option>Incendio estructural</option>
+              <option>Incendio vehicular</option>
+              <option>Incendio forestal</option>
+              <option>Accidente vehicular</option>
+              <option>Inundación</option>
+              <option>Fuga de gas</option>
+              <option>Derrumbe / colapso</option>
+              <option>Rescate</option>
+              <option>Otro</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label class="required">Folio / Número de incidente</label>
+            <input type="text" name="folio" id="folio" placeholder="Ej. INC-001" required>
+          </div>
+
+          <div class="campo">
+            <label class="required">Fecha</label>
+            <input type="date" name="fecha" id="fecha" required>
+          </div>
+
+          <div class="campo">
+            <label class="required">Hora de inicio</label>
+            <input type="time" name="hora" id="hora" required>
+          </div>
+
+          <div class="campo campo-full">
+            <label class="required">Ubicación / Dirección</label>
+            <input type="text" name="ubicacion" id="ubicacion" placeholder="Ej. Av. Tecnológico #100, Colonia San Pedro Totoltepec, Metepec" required>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- SECCIÓN 2: Nivel de emergencia (selector visual) -->
+      <fieldset class="seccion fade-up">
+        <legend>⚠️ &nbsp;Nivel de Emergencia</legend>
+        <div class="nivel-selector">
+
+          <div class="nivel-option bajo">
+            <input type="radio" name="nivel" id="nivel-bajo" value="bajo">
+            <label for="nivel-bajo">
+              <span class="nivel-icon">🟢</span>
+              Bajo
+              <span class="nivel-num">NIVEL 1</span>
+            </label>
+          </div>
+
+          <div class="nivel-option medio">
+            <input type="radio" name="nivel" id="nivel-medio" value="medio">
+            <label for="nivel-medio">
+              <span class="nivel-icon">🟡</span>
+              Medio
+              <span class="nivel-num">NIVEL 2</span>
+            </label>
+          </div>
+
+          <div class="nivel-option alto">
+            <input type="radio" name="nivel" id="nivel-alto" value="alto" checked>
+            <label for="nivel-alto">
+              <span class="nivel-icon">🔴</span>
+              Alto
+              <span class="nivel-num">NIVEL 3</span>
+            </label>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- SECCIÓN 3: Descripción -->
+      <fieldset class="seccion fade-up">
+        <legend>📝 &nbsp;Descripción del Incidente</legend>
+        <div class="campos-grid">
+
+          <div class="campo campo-full">
+            <label>Descripción general</label>
+            <textarea name="descripcion" id="descripcion" placeholder="Describa las condiciones iniciales, área afectada y situación al momento de la notificación..." style="height:120px;"></textarea>
+          </div>
+
+          <div class="campo">
+            <label>Personas afectadas (estimado)</label>
+            <input type="number" name="afectados" min="0" placeholder="0">
+          </div>
+
+          <div class="campo">
+            <label>Fuente de notificación</label>
+            <select name="fuente">
+              <option value="">— Seleccionar —</option>
+              <option>911 — Llamada ciudadana</option>
+              <option>Radio institucional</option>
+              <option>Reporte de patrulla</option>
+              <option>Redes sociales</option>
+              <option>Otra dependencia</option>
+            </select>
+          </div>
+
+        </div>
+      </fieldset>
+
+      <!-- BOTONES -->
+      <div class="acciones">
+        <button type="submit" class="btn btn-primary">🚨 &nbsp;Registrar Incidente</button>
+        <button type="reset"  class="btn btn-secondary">Limpiar</button>
+        <a href="dashboard.html" class="btn btn-ghost">← Volver</a>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Coordinación de Protección Civil y Bomberos de Metepec &nbsp;|&nbsp; GECI-VA v1.0
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      Incidente registrado
+      <span>Los datos han sido guardados correctamente.</span>
+    </div>
+  </div>
+
+  <script>
+    /* Autocompletar fecha y hora con el momento actual */
+    const ahora = new Date();
+    document.getElementById('fecha').value = ahora.toISOString().split('T')[0];
+    document.getElementById('hora').value  = ahora.toTimeString().slice(0, 5);
+
+    /* Manejo del formulario */
+    document.getElementById('formIncidente').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      /* Validación básica */
+      const tipo = document.getElementById('tipo').value;
+      const folio = document.getElementById('folio').value.trim();
+      const ubicacion = document.getElementById('ubicacion').value.trim();
+
+      if (!tipo || !folio || !ubicacion) {
+        if (!tipo)      markError('tipo');
+        if (!folio)     markError('folio');
+        if (!ubicacion) markError('ubicacion');
+        return;
+      }
+
+      /* Mostrar toast de éxito */
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3500);
+    });
+
+    function markError(id) {
+      const el = document.getElementById(id);
+      el.closest('.campo').classList.add('error');
+      el.addEventListener('input', function clear() {
+        el.closest('.campo').classList.remove('error');
+        el.removeEventListener('input', clear);
+      }, { once: true });
+      el.focus();
+    }
+  </script>
+
+</body>
+</html>
