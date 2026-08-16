@@ -1,0 +1,3 @@
+git add public/.gitkeep
+git commit -m "Fix: mantener carpeta public/ trackeada en git aunque este vacia"
+git push

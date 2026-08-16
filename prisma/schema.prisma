@@ -1,0 +1,290 @@
+// Esquema de base de datos de GECI-VA
+//
+// Este archivo describe las 11 entidades del sistema conforme al diagrama
+// E-R de la fase de diseño (notación CHEN) y al modelo de clases del
+// documento del proyecto terminal. Cada tabla se pensó para cumplir la
+// tercera forma normal: nada de columnas repetidas para representar
+// listas, y ningún campo que dependa de otro campo que no sea la llave
+// primaria de su propia tabla.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 1: Control de Acceso y Gestión de Usuarios
+// ---------------------------------------------------------------------
+
+// Catálogo de los seis roles definidos en la especificación técnica.
+// Se separó de Usuario para no repetir el nombre del rol en cada fila
+// de usuario (eso rompería la 3FN).
+model Rol {
+  idRol       Int    @id @default(autoincrement()) @map("id_rol")
+  nombre      String @unique @db.VarChar(50)
+  descripcion String? @db.VarChar(255)
+
+  usuarios Usuario[]
+
+  @@map("roles")
+}
+
+model Usuario {
+  idUsuario         Int       @id @default(autoincrement()) @map("id_usuario")
+  nombreCompleto    String    @map("nombre_completo") @db.VarChar(150)
+  correo            String    @unique @db.VarChar(150)
+  contrasenaHash    String    @map("contrasena_hash") @db.VarChar(255)
+  idRol             Int       @map("id_rol")
+  estado            Boolean   @default(true) // true = activo, false = inactivo (borrado lógico)
+  fechaRegistro     DateTime  @default(now()) @map("fecha_registro")
+  fechaUltimoAcceso DateTime? @map("fecha_ultimo_acceso")
+
+  rol Rol @relation(fields: [idRol], references: [idRol])
+
+  // Historiales que dependen de este usuario en otros módulos
+  incidentesRegistrados     Incidente[]          @relation("IncidenteRegistradoPor")
+  incidentesCerrados        Incidente[]          @relation("IncidenteCerradoPor")
+  asignacionesRealizadas    AsignacionRecurso[]   @relation("AsignacionRealizadaPor")
+  victimasRegistradas       Victima[]             @relation("VictimaRegistradaPor")
+  clasificacionesTriage     HistorialTriage[]     @relation("TriageClasificadoPor")
+  formulariosGenerados      FormularioSci[]       @relation("FormularioGeneradoPor")
+  auditorias                Auditoria[]
+
+  @@map("usuarios")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 2: Registro de Incidentes
+// ---------------------------------------------------------------------
+
+enum EstadoIncidente {
+  ACTIVO
+  CERRADO
+}
+
+model Incidente {
+  idIncidente          Int             @id @default(autoincrement()) @map("id_incidente")
+  folio                String          @unique @db.VarChar(30)
+  nombre               String          @db.VarChar(150)
+  fechaHoraInicio      DateTime        @map("fecha_hora_inicio")
+  fechaHoraCierre      DateTime?       @map("fecha_hora_cierre")
+  lugar                String          @db.VarChar(255)
+  tipo                 String          @db.VarChar(100) // naturaleza del incidente
+  amenazasPresentes    String?         @map("amenazas_presentes")
+  areasAfectadas       String?         @map("areas_afectadas")
+  objetivoInicial      String?         @map("objetivo_inicial")
+  ubicacionPc          String?         @map("ubicacion_pc") // puesto de comando
+  ubicacionAe          String?         @map("ubicacion_ae") // área de espera
+  rutaIngreso          String?         @map("ruta_ingreso")
+  rutaEgreso           String?         @map("ruta_egreso")
+  mensajeSeguridad     String?         @map("mensaje_seguridad")
+  canalesComunicacion  String?         @map("canales_comunicacion")
+  estado               EstadoIncidente @default(ACTIVO)
+  observacionesCierre  String?         @map("observaciones_cierre")
+  idUsuarioRegistro    Int             @map("id_usuario_registro")
+  idUsuarioCierre      Int?            @map("id_usuario_cierre")
+  fechaModificacion    DateTime        @updatedAt @map("fecha_modificacion")
+
+  usuarioRegistro Usuario  @relation("IncidenteRegistradoPor", fields: [idUsuarioRegistro], references: [idUsuario])
+  usuarioCierre   Usuario? @relation("IncidenteCerradoPor", fields: [idUsuarioCierre], references: [idUsuario])
+
+  periodosOperacionales PeriodoOperacional[]
+  asignacionesRecurso   AsignacionRecurso[]
+  victimas              Victima[]
+  planesAccion          PlanAccion[]
+  formulariosSci        FormularioSci[]
+
+  @@map("incidentes")
+}
+
+model PeriodoOperacional {
+  idPeriodo         Int      @id @default(autoincrement()) @map("id_periodo")
+  idIncidente       Int      @map("id_incidente")
+  numeroPeriodo     Int      @map("numero_periodo")
+  fechaHoraInicio   DateTime @map("fecha_hora_inicio")
+  fechaHoraFin      DateTime @map("fecha_hora_fin")
+  observaciones     String?
+
+  incidente  Incidente   @relation(fields: [idIncidente], references: [idIncidente])
+  planesAccion PlanAccion[]
+
+  @@unique([idIncidente, numeroPeriodo])
+  @@map("periodos_operacionales")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 3: Gestión de Recursos y Personal
+// ---------------------------------------------------------------------
+
+enum EstadoRecurso {
+  DISPONIBLE
+  ASIGNADO
+  NO_DISPONIBLE
+}
+
+model Recurso {
+  idRecurso      Int           @id @default(autoincrement()) @map("id_recurso")
+  nombre         String        @db.VarChar(150)
+  clase          String        @db.VarChar(100)
+  tipo           String        @db.VarChar(100)
+  institucion    String?       @db.VarChar(150)
+  matricula      String?       @db.VarChar(50)
+  numeroPersonas Int?          @map("numero_personas")
+  estado         EstadoRecurso @default(DISPONIBLE)
+
+  asignaciones AsignacionRecurso[]
+
+  @@map("recursos")
+}
+
+model AsignacionRecurso {
+  idAsignacion                  Int       @id @default(autoincrement()) @map("id_asignacion")
+  idIncidente                   Int       @map("id_incidente")
+  idRecurso                     Int       @map("id_recurso")
+  fechaHoraAsignacion            DateTime  @default(now()) @map("fecha_hora_asignacion")
+  tareaAsignada                 String?   @map("tarea_asignada")
+  ubicacionAsignacion            String?   @map("ubicacion_asignacion")
+  fechaHoraDesmovilizacion       DateTime? @map("fecha_hora_desmovilizacion")
+  observacionesDesmovilizacion  String?   @map("observaciones_desmovilizacion")
+  idUsuarioAsigno                Int       @map("id_usuario_asigno")
+
+  incidente     Incidente @relation(fields: [idIncidente], references: [idIncidente])
+  recurso       Recurso   @relation(fields: [idRecurso], references: [idRecurso])
+  usuarioAsigno Usuario   @relation("AsignacionRealizadaPor", fields: [idUsuarioAsigno], references: [idUsuario])
+
+  @@map("asignaciones_recurso")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 4: Plan de Acción del Incidente
+// ---------------------------------------------------------------------
+
+model PlanAccion {
+  idPai                    Int      @id @default(autoincrement()) @map("id_pai")
+  idIncidente              Int      @map("id_incidente")
+  idPeriodo                Int      @unique @map("id_periodo") // un PAI por periodo operacional
+  objetivosOperacionales   String   @map("objetivos_operacionales")
+  estrategias              String?
+  tacticas                 String?
+  recursosEnLugar          String?  @map("recursos_en_lugar")
+  recursosPorSolicitar     String?  @map("recursos_por_solicitar")
+  mensajeSeguridad         String?  @map("mensaje_seguridad")
+  pronosticoTiempo         String?  @map("pronostico_tiempo")
+  nombreJefePlanificacion  String?  @map("nombre_jefe_planificacion")
+  fechaHoraPreparacion     DateTime @default(now()) @map("fecha_hora_preparacion")
+  fechaModificacion        DateTime @updatedAt @map("fecha_modificacion")
+
+  incidente Incidente          @relation(fields: [idIncidente], references: [idIncidente])
+  periodo   PeriodoOperacional @relation(fields: [idPeriodo], references: [idPeriodo])
+
+  @@map("planes_accion")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 5: Registro de Víctimas
+// ---------------------------------------------------------------------
+
+enum EstadoVictima {
+  EN_ESPERA
+  ATENDIDO_EN_SITIO
+  TRASLADADO
+}
+
+enum ClasificacionTriage {
+  ROJO
+  AMARILLO
+  VERDE
+  NEGRO
+}
+
+model Victima {
+  idVictima            Int           @id @default(autoincrement()) @map("id_victima")
+  idIncidente          Int           @map("id_incidente")
+  nombrePaciente       String?       @map("nombre_paciente") @db.VarChar(150)
+  sexo                 String?       @db.VarChar(20)
+  edad                 Int?
+  lugarRegistro        String        @map("lugar_registro") @db.VarChar(100) // ACV / Unidad Médica / Otro
+  fechaHoraRegistro     DateTime      @default(now()) @map("fecha_hora_registro")
+  estadoAtencion       EstadoVictima @default(EN_ESPERA) @map("estado_atencion")
+  lugarTraslado        String?       @map("lugar_traslado")
+  centroHospitalario   String?       @map("centro_hospitalario") @db.VarChar(150)
+  fechaHoraTraslado     DateTime?     @map("fecha_hora_traslado")
+  notasAdicionales     String?       @map("notas_adicionales") @db.VarChar(500)
+  idUsuarioRegistro    Int           @map("id_usuario_registro")
+
+  incidente        Incidente         @relation(fields: [idIncidente], references: [idIncidente])
+  usuarioRegistro  Usuario           @relation("VictimaRegistradaPor", fields: [idUsuarioRegistro], references: [idUsuario])
+  historialTriage  HistorialTriage[]
+
+  @@map("victimas")
+}
+
+// Cada evaluación de triage se guarda como un renglón nuevo, nunca se
+// sobreescribe la anterior: así queda la historia completa de cómo
+// cambió la clasificación de una víctima durante el incidente.
+model HistorialTriage {
+  idEvaluacion             Int                 @id @default(autoincrement()) @map("id_evaluacion")
+  idVictima                Int                 @map("id_victima")
+  clasificacion            ClasificacionTriage
+  fechaHoraClasificacion    DateTime            @default(now()) @map("fecha_hora_clasificacion")
+  idUsuarioClasifico        Int                 @map("id_usuario_clasifico")
+
+  victima           Victima @relation(fields: [idVictima], references: [idVictima])
+  usuarioClasifico Usuario @relation("TriageClasificadoPor", fields: [idUsuarioClasifico], references: [idUsuario])
+
+  @@map("historial_triage")
+}
+
+// ---------------------------------------------------------------------
+// Módulo 6: Consultas y Reportes (formularios SCI + auditoría)
+// ---------------------------------------------------------------------
+
+enum TipoFormularioSci {
+  SCI_201
+  SCI_202
+  SCI_205
+  SCI_206
+  SCI_207
+  SCI_211
+}
+
+// Los seis formularios comparten la misma tabla porque, más allá del
+// incidente al que pertenecen y quién los generó, lo único que cambia
+// entre ellos es el contenido capturado, y ese contenido varía de
+// formulario a formulario. Guardarlo en un campo JSON evita crear seis
+// tablas casi idénticas y sigue permitiendo consultar cualquier
+// formulario por su tipo.
+model FormularioSci {
+  idFormulario          Int               @id @default(autoincrement()) @map("id_formulario")
+  idIncidente           Int               @map("id_incidente")
+  tipoFormulario        TipoFormularioSci @map("tipo_formulario")
+  contenido             Json
+  fechaHoraGeneracion    DateTime          @default(now()) @map("fecha_hora_generacion")
+  idUsuarioGenero        Int               @map("id_usuario_genero")
+
+  incidente      Incidente @relation(fields: [idIncidente], references: [idIncidente])
+  usuarioGenero Usuario   @relation("FormularioGeneradoPor", fields: [idUsuarioGenero], references: [idUsuario])
+
+  @@map("formularios_sci")
+}
+
+// Bitácora de auditoría exigida por el RNF-10: quién hizo qué y cuándo,
+// de solo consulta para el Administrador, sin que nadie pueda borrarla
+// ni modificarla desde la aplicación.
+model Auditoria {
+  idAuditoria       Int      @id @default(autoincrement()) @map("id_auditoria")
+  idUsuario         Int      @map("id_usuario")
+  accion            String   @db.VarChar(100)
+  entidadAfectada   String   @map("entidad_afectada") @db.VarChar(100)
+  idEntidadAfectada Int?     @map("id_entidad_afectada")
+  fechaHora         DateTime @default(now()) @map("fecha_hora")
+  detalles          Json?
+
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
+
+  @@map("auditoria")
+}
