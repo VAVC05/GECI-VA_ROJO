@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -30,12 +31,27 @@ export default function DashboardPage() {
           </p>
         )}
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="mt-6 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
-        >
-          Cerrar sesión
-        </button>
+        <div className="mt-6 flex flex-col gap-3">
+          <Link href="/incidentes">
+            <button className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500">
+              Ver incidentes
+            </button>
+          </Link>
+		  
+		  <Link
+  href="/recursos"
+  className="block rounded-md bg-green-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-500"
+>
+  Ver recursos
+</Link>
+
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="w-full rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
     </main>
   );
