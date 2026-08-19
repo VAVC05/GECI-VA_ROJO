@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -94,7 +95,7 @@ export async function PUT(
 
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: result.error.errors },
+        { error: 'Datos inválidos', details: result.error.issues },
         { status: 400 }
       );
     }

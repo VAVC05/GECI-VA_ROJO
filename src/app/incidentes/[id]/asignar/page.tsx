@@ -14,8 +14,10 @@ interface Recurso {
 
 interface IncidenteBasico {
   idIncidente: number;
-  folio: string;
+   folio: string;
   nombre: string;
+   tipo: string;
+   lugar: string;
   estado: "ACTIVO" | "CERRADO";
 }
 

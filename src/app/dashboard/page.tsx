@@ -37,13 +37,19 @@ export default function DashboardPage() {
               Ver incidentes
             </button>
           </Link>
-		  
-		  <Link
-  href="/recursos"
-  className="block rounded-md bg-green-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-500"
->
-  Ver recursos
-</Link>
+
+          <Link href="/recursos">
+            <button className="w-full rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500">
+              Ver recursos
+            </button>
+          </Link>
+
+          {/* ✅ NUEVO: Enlace a Estadísticas */}
+          <Link href="/estadisticas">
+            <button className="w-full rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500">
+              Ver estadísticas
+            </button>
+          </Link>
 
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}

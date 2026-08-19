@@ -19,7 +19,7 @@ const updateIncidentSchema = z.object({
   canalesComunicacion: z.string().optional(),
 });
 
-// ✅ CORREGIDO: params ahora es una Promesa, se usa await
+// GET /api/incidentes/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -30,10 +30,8 @@ export async function GET(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // ✅ AWAIT params ANTES de usarlo
     const { id } = await params;
     const idNumero = parseInt(id);
-    
     if (isNaN(idNumero)) {
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
@@ -69,7 +67,7 @@ export async function GET(
   }
 }
 
-// ✅ CORREGIDO: PUT también con await params
+// PUT /api/incidentes/[id]
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -98,7 +96,7 @@ export async function PUT(
     const result = updateIncidentSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: result.error.errors },
+        { error: 'Datos inválidos', details: result.error.issues },
         { status: 400 }
       );
     }
@@ -134,7 +132,7 @@ export async function PUT(
   }
 }
 
-// ✅ CORREGIDO: PATCH también con await params
+// PATCH /api/incidentes/[id]/cerrar
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
