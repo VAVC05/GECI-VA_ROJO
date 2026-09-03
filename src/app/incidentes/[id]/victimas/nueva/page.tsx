@@ -18,13 +18,40 @@ export default function NuevaVictimaPage() {
     setCargando(true);
 
     const formData = new FormData(e.currentTarget);
+    const nombrePaciente = (formData.get("nombrePaciente") as string)?.trim() || "";
+    const sexo = formData.get("sexo") as string;
+    const edad = parseInt(formData.get("edad") as string) || undefined;
+    const lugarRegistro = formData.get("lugarRegistro") as string;
+    const notasAdicionales = (formData.get("notasAdicionales") as string)?.trim() || undefined;
+
+    // VALIDACIÓN: Nombre no puede estar vacío
+    if (!nombrePaciente) {
+      setError("El nombre del paciente es obligatorio");
+      setCargando(false);
+      return;
+    }
+
+    // VALIDACIÓN: Nombre no puede ser solo números
+    if (/^\d+$/.test(nombrePaciente)) {
+      setError("El nombre del paciente no puede ser solo números");
+      setCargando(false);
+      return;
+    }
+
+    // VALIDACIÓN: Nombre no puede tener menos de 2 caracteres
+    if (nombrePaciente.length < 2) {
+      setError("El nombre del paciente debe tener al menos 2 caracteres");
+      setCargando(false);
+      return;
+    }
+
     const data = {
       idIncidente: parseInt(id),
-      nombrePaciente: (formData.get("nombrePaciente") as string) || undefined,
-      sexo: formData.get("sexo") as string,
-      edad: parseInt(formData.get("edad") as string) || undefined,
-      lugarRegistro: formData.get("lugarRegistro") as string,
-      notasAdicionales: (formData.get("notasAdicionales") as string) || undefined,
+      nombrePaciente,
+      sexo,
+      edad,
+      lugarRegistro,
+      notasAdicionales,
     };
 
     try {
@@ -66,15 +93,17 @@ export default function NuevaVictimaPage() {
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-6">
           <div>
             <label htmlFor="nombrePaciente" className="block text-sm font-medium text-slate-300">
-              Nombre del paciente
+              Nombre del paciente *
             </label>
             <input
               type="text"
               id="nombrePaciente"
               name="nombrePaciente"
+              required
               className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
-              placeholder="Ej: Juan Pérez (opcional)"
+              placeholder="Ej: Juan Pérez"
             />
+            <p className="mt-1 text-xs text-slate-500">No puede estar vacío ni ser solo números</p>
           </div>
 
           <div>

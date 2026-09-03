@@ -125,5 +125,66 @@ export async function PUT(
       { error: 'Error al actualizar víctima' },
       { status: 500 }
     );
+	
+	
+
+// DELETE /api/victimas/[id]
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const rolesPermitidos = ['Administrador', 'Jefe Paramedicos'];
+    if (!rolesPermitidos.includes(session.user?.rol || '')) {
+      return NextResponse.json(
+        { error: 'No tienes permisos para eliminar víctimas' },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const idNumero = parseInt(id);
+    if (isNaN(idNumero)) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    }
+
+    const victima = await prisma.victima.findUnique({
+      where: { idVictima: idNumero },
+      include: { incidente: true },
+    });
+
+    if (!victima) {
+      return NextResponse.json({ error: 'Víctima no encontrada' }, { status: 404 });
+    }
+
+    if (victima.incidente.estado !== 'ACTIVO') {
+      return NextResponse.json(
+        { error: 'No se puede eliminar una víctima de un incidente cerrado' },
+        { status: 400 }
+      );
+    }
+
+    await prisma.historialTriage.deleteMany({
+      where: { idVictima: idNumero },
+    });
+
+    await prisma.victima.delete({
+      where: { idVictima: idNumero },
+    });
+
+    return NextResponse.json({ message: 'Víctima eliminada correctamente' });
+  } catch (error) {
+    console.error('Error en DELETE /api/victimas/[id]:', error);
+    return NextResponse.json(
+      { error: 'Error al eliminar víctima' },
+      { status: 500 }
+    );
+  }
+}
   }
 }

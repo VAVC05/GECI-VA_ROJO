@@ -9,140 +9,170 @@ interface BotonGenerarPDFProps {
 
 export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
   const generarPDF = () => {
-    const doc = new jsPDF();
+    const generarPDFAsync = async () => {
+      try {
+        const [bomberosBase64, pcBase64] = await Promise.all([
+          fetch("/logos/bomberos.png")
+            .then((r) => r.blob())
+            .then((blob) => new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            })),
+          fetch("/logos/pc_metepec.png")
+            .then((r) => r.blob())
+            .then((blob) => new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            })),
+        ]);
 
-    // --- Título ---
-    doc.setFontSize(18);
-    doc.setTextColor(0, 51, 102);
-    doc.text(`Reporte de Incidente - ${incidente.folio}`, 14, 22);
+        const doc = new jsPDF();
+        doc.setFont("helvetica", "normal");
 
-    // --- Información general ---
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    let y = 35;
+        const xInicio = 14;
+        const yInicio = 10;
+        const altoLogo = 16; // Tamaño pequeño y uniforme
 
-    const info = [
-      ["Nombre:", incidente.nombre],
-      ["Tipo:", incidente.tipo],
-      ["Lugar:", incidente.lugar],
-      ["Estado:", incidente.estado],
-      ["Fecha de inicio:", new Date(incidente.fechaHoraInicio).toLocaleString()],
-    ];
-    if (incidente.fechaHoraCierre) {
-      info.push(["Fecha de cierre:", new Date(incidente.fechaHoraCierre).toLocaleString()]);
-    }
-    info.push(["Registrado por:", incidente.usuarioRegistro?.nombreCompleto || "N/A"]);
-    if (incidente.observacionesCierre) {
-      info.push(["Observaciones de cierre:", incidente.observacionesCierre]);
-    }
+        // Logos del mismo tamaño, alineados a la izquierda
+        if (bomberosBase64) {
+          doc.addImage(bomberosBase64 as string, "PNG", xInicio, yInicio, 20, altoLogo);
+        }
+        if (pcBase64) {
+          doc.addImage(pcBase64 as string, "PNG", xInicio + 28, yInicio, 20, altoLogo);
+        }
 
-    info.forEach(([label, value]) => {
-      doc.text(`${label} ${value}`, 14, y);
-      y += 8;
-    });
+        // Línea vertical separadora (opcional, pero no necesaria en PDF)
+        // doc.line(xInicio + 24, yInicio, xInicio + 24, yInicio + altoLogo);
 
-    y += 4;
+        doc.setFontSize(16);
+        doc.setTextColor(0, 51, 102);
+        doc.text(`Reporte - ${incidente.folio}`, xInicio, yInicio + altoLogo + 8);
 
-    // --- Recursos asignados (tabla) ---
-    if (incidente.asignacionesRecurso && incidente.asignacionesRecurso.length > 0) {
-      doc.setFontSize(14);
-      doc.setTextColor(0, 51, 102);
-      doc.text("Recursos asignados:", 14, y);
-      y += 6;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
+        // Resto del contenido...
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
 
-      const tableData = incidente.asignacionesRecurso.map((asignacion: any) => [
-        asignacion.recurso?.nombre || "N/A",
-        asignacion.recurso?.tipo || "N/A",
-        asignacion.tareaAsignada || "Sin tarea",
-        asignacion.ubicacionAsignacion || "N/A",
-      ]);
+        let y = yInicio + altoLogo + 16;
+        const lineHeight = 7;
 
-      autoTable(doc, {
-        startY: y,
-        head: [["Recurso", "Tipo", "Tarea", "Ubicación"]],
-        body: tableData,
-        theme: "striped",
-        headStyles: { fillColor: [0, 51, 102], textColor: 255, fontSize: 8 },
-        bodyStyles: { fontSize: 8 },
-        margin: { left: 14, right: 14 },
-      });
-      y = (doc as any).lastAutoTable.finalY + 8;
-    }
+        doc.text(`Nombre: ${incidente.nombre}`, xInicio, y);
+        y += lineHeight;
+        doc.text(`Tipo: ${incidente.tipo}`, xInicio, y);
+        y += lineHeight;
+        doc.text(`Lugar: ${incidente.lugar}`, xInicio, y);
+        y += lineHeight;
+        doc.text(`Estado: ${incidente.estado}`, xInicio, y);
+        y += lineHeight;
+        doc.text(`Fecha de inicio: ${new Date(incidente.fechaHoraInicio).toLocaleString()}`, xInicio, y);
+        y += lineHeight;
+        if (incidente.fechaHoraCierre) {
+          doc.text(`Fecha de cierre: ${new Date(incidente.fechaHoraCierre).toLocaleString()}`, xInicio, y);
+          y += lineHeight;
+        }
+        doc.text(`Registrado por: ${incidente.usuarioRegistro?.nombreCompleto || "N/A"}`, xInicio, y);
+        y += lineHeight;
 
-    // --- Víctimas (tabla) ---
-    if (incidente.victimas && incidente.victimas.length > 0) {
-      doc.setFontSize(14);
-      doc.setTextColor(0, 51, 102);
-      doc.text("Víctimas registradas:", 14, y);
-      y += 6;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
+        if (incidente.observacionesCierre) {
+          doc.text(`Observaciones de cierre: ${incidente.observacionesCierre}`, xInicio, y);
+          y += lineHeight;
+        }
 
-      const tableData = incidente.victimas.map((victima: any) => {
-        const triage = victima.historialTriage?.[0]?.clasificacion || "Sin clasificar";
-        const observaciones = victima.notasAdicionales || "N/A";
-        return [
-          victima.nombrePaciente || "No identificado",
-          victima.sexo || "N/A",
-          victima.edad || "?",
-          triage,
-          victima.estadoAtencion || "N/A",
-          victima.centroHospitalario || "N/A",
-          observaciones,
-        ];
-      });
+        // Recursos
+        if (incidente.asignacionesRecurso && incidente.asignacionesRecurso.length > 0) {
+          y += 4;
+          doc.setFontSize(12);
+          doc.setTextColor(0, 51, 102);
+          doc.text("Recursos asignados:", xInicio, y);
+          y += 6;
+          doc.setFontSize(9);
+          doc.setTextColor(0, 0, 0);
 
-      autoTable(doc, {
-        startY: y,
-        head: [["Nombre", "Sexo", "Edad", "Triage", "Estado", "Hospital", "Observaciones"]],
-        body: tableData,
-        theme: "striped",
-        headStyles: { fillColor: [0, 51, 102], textColor: 255, fontSize: 7 },
-        bodyStyles: { fontSize: 7 },
-        margin: { left: 14, right: 14 },
-        styles: { cellPadding: 1.5 },
-        columnStyles: {
-          0: { cellWidth: 30 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 15 },
-          3: { cellWidth: 25 },
-          4: { cellWidth: 25 },
-          5: { cellWidth: 30 },
-          6: { cellWidth: 40 },
-        },
-      });
-      y = (doc as any).lastAutoTable.finalY + 8;
-    }
+          const recursosData = incidente.asignacionesRecurso.map((asignacion: any) => [
+            asignacion.recurso?.nombre || "Sin nombre",
+            asignacion.recurso?.tipo || "N/A",
+            asignacion.tareaAsignada || "Sin tarea",
+            asignacion.ubicacionAsignacion || "N/A",
+          ]);
 
-    // --- Resumen de estadísticas (opcional) ---
-    if (incidente.victimas && incidente.victimas.length > 0) {
-      const triageCount: { [key: string]: number } = {};
-      incidente.victimas.forEach((v: any) => {
-        const triage = v.historialTriage?.[0]?.clasificacion || "Sin clasificar";
-        triageCount[triage] = (triageCount[triage] || 0) + 1;
-      });
+          autoTable(doc, {
+            startY: y + 2,
+            head: [["Nombre", "Tipo", "Tarea", "Ubicación"]],
+            body: recursosData,
+            theme: "striped",
+            headStyles: { fillColor: [0, 51, 102] },
+            styles: { fontSize: 7 },
+            margin: { left: 14, right: 14 },
+          });
+          y = (doc as any).lastAutoTable.finalY + 8;
+        }
 
-      doc.setFontSize(12);
-      doc.setTextColor(0, 51, 102);
-      doc.text("Resumen por clasificación de triage:", 14, y);
-      y += 6;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      for (const [key, value] of Object.entries(triageCount)) {
-        doc.text(`- ${key}: ${value}`, 16, y);
-        y += 6;
+        // Víctimas
+        if (incidente.victimas && incidente.victimas.length > 0) {
+          if (y > 240) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.setFontSize(12);
+          doc.setTextColor(0, 51, 102);
+          doc.text("Víctimas registradas:", xInicio, y);
+          y += 6;
+          doc.setFontSize(9);
+          doc.setTextColor(0, 0, 0);
+
+          const victimasData = incidente.victimas.map((victima: any) => {
+            const ultimoTriage = victima.historialTriage?.[0]?.clasificacion || "Sin clasificar";
+            const hospital = victima.centroHospitalario || "N/A";
+            const notas = victima.notasAdicionales || "—";
+            return [
+              victima.nombrePaciente || "No identificado",
+              victima.sexo || "N/A",
+              victima.edad || "?",
+              ultimoTriage,
+              victima.estadoAtencion || "EN_ESPERA",
+              hospital,
+              notas,
+            ];
+          });
+
+          autoTable(doc, {
+            startY: y + 2,
+            head: [["Nombre", "Sexo", "Edad", "Triage", "Estado", "Hospital", "Observaciones"]],
+            body: victimasData,
+            theme: "striped",
+            headStyles: { fillColor: [0, 51, 102] },
+            styles: { fontSize: 6.5 },
+            columnStyles: {
+              0: { cellWidth: 28 },
+              1: { cellWidth: 18 },
+              2: { cellWidth: 14 },
+              3: { cellWidth: 24 },
+              4: { cellWidth: 24 },
+              5: { cellWidth: 32 },
+              6: { cellWidth: 38 },
+            },
+            margin: { left: 14, right: 14 },
+          });
+          y = (doc as any).lastAutoTable.finalY + 8;
+        }
+
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Generado desde GECI-VA el ${new Date().toLocaleString()}`, xInicio, 285);
+
+        doc.save(`incidente_${incidente.folio}.pdf`);
+      } catch (error) {
+        console.error("Error al generar PDF:", error);
+        alert("Error al generar el PDF. Revisa que los logos estén en la carpeta public/logos/");
       }
-    }
+    };
 
-    // --- Pie de página ---
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`Generado desde GECI-VA el ${new Date().toLocaleString()}`, 14, 285);
-
-    // Guardar PDF
-    doc.save(`incidente_${incidente.folio}.pdf`);
+    generarPDFAsync();
   };
 
   return (

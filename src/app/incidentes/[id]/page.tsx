@@ -19,8 +19,19 @@ interface Incidente {
     correo: string;
   };
   observacionesCierre: string | null;
+  amenazasPresentes: string | null;
+  areasAfectadas: string | null;
+  objetivoInicial: string | null;
+  ubicacionPc: string | null;
+  ubicacionAe: string | null;
+  rutaIngreso: string | null;
+  rutaEgreso: string | null;
+  mensajeSeguridad: string | null;
+  canalesComunicacion: string | null;
   victimas?: any[];
   asignacionesRecurso?: any[];
+  periodosOperacionales?: any[];
+  planesAccion?: any[];
 }
 
 export default function DetalleIncidentePage() {
@@ -41,47 +52,20 @@ export default function DetalleIncidentePage() {
           }
           return res.json();
         })
-        .then((data) => setIncidente(data))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
+        .then((data) => {
+          setIncidente(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
     }
   };
 
   useEffect(() => {
     cargarDetalle();
   }, [id]);
-
-  const handleClasificar = async (victimaId: number) => {
-    const color = prompt("Clasificación (ROJO, AMARILLO, VERDE, NEGRO):");
-    if (color && ["ROJO", "AMARILLO", "VERDE", "NEGRO"].includes(color)) {
-      const res = await fetch(`/api/victimas/${victimaId}/triage`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clasificacion: color }),
-      });
-      if (res.ok) {
-        cargarDetalle(); // Recarga los datos sin recargar la página completa
-      } else {
-        alert("Error al clasificar");
-      }
-    }
-  };
-
-  const handleTrasladar = async (victimaId: number) => {
-    const hospital = prompt("Centro hospitalario:");
-    if (hospital) {
-      const res = await fetch(`/api/victimas/${victimaId}/traslado`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ centroHospitalario: hospital }),
-      });
-      if (res.ok) {
-        cargarDetalle();
-      } else {
-        alert("Error al registrar traslado");
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -153,6 +137,67 @@ export default function DetalleIncidentePage() {
             </div>
           </div>
 
+          {/* Información adicional del incidente */}
+          <div className="mt-6 border-t border-slate-700 pt-4">
+            <h3 className="text-sm font-medium text-slate-400 mb-2">Información adicional</h3>
+            <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+              {incidente.amenazasPresentes && (
+                <div>
+                  <span className="text-slate-500">Amenazas presentes:</span>{" "}
+                  <span className="text-white">{incidente.amenazasPresentes}</span>
+                </div>
+              )}
+              {incidente.areasAfectadas && (
+                <div>
+                  <span className="text-slate-500">Áreas afectadas:</span>{" "}
+                  <span className="text-white">{incidente.areasAfectadas}</span>
+                </div>
+              )}
+              {incidente.objetivoInicial && (
+                <div>
+                  <span className="text-slate-500">Objetivo inicial:</span>{" "}
+                  <span className="text-white">{incidente.objetivoInicial}</span>
+                </div>
+              )}
+              {incidente.ubicacionPc && (
+                <div>
+                  <span className="text-slate-500">Ubicación Puesto de Comando:</span>{" "}
+                  <span className="text-white">{incidente.ubicacionPc}</span>
+                </div>
+              )}
+              {incidente.ubicacionAe && (
+                <div>
+                  <span className="text-slate-500">Ubicación Área de Espera:</span>{" "}
+                  <span className="text-white">{incidente.ubicacionAe}</span>
+                </div>
+              )}
+              {incidente.rutaIngreso && (
+                <div>
+                  <span className="text-slate-500">Ruta de ingreso:</span>{" "}
+                  <span className="text-white">{incidente.rutaIngreso}</span>
+                </div>
+              )}
+              {incidente.rutaEgreso && (
+                <div>
+                  <span className="text-slate-500">Ruta de egreso:</span>{" "}
+                  <span className="text-white">{incidente.rutaEgreso}</span>
+                </div>
+              )}
+              {incidente.mensajeSeguridad && (
+                <div>
+                  <span className="text-slate-500">Mensaje de seguridad:</span>{" "}
+                  <span className="text-white">{incidente.mensajeSeguridad}</span>
+                </div>
+              )}
+              {incidente.canalesComunicacion && (
+                <div>
+                  <span className="text-slate-500">Canales de comunicación:</span>{" "}
+                  <span className="text-white">{incidente.canalesComunicacion}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {incidente.estado === "CERRADO" && incidente.observacionesCierre && (
             <div className="mt-4 rounded border border-red-800 bg-red-950 p-3">
               <p className="text-sm text-slate-400">Observaciones de cierre</p>
@@ -160,7 +205,202 @@ export default function DetalleIncidentePage() {
             </div>
           )}
 
-          {/* 🆕 TABLA DE VÍCTIMAS - CORREGIDA Y COMPACTA */}
+          {/* SECCIÓN 1: PERIODOS OPERACIONALES */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Periodos Operacionales</h2>
+              {incidente.estado === "ACTIVO" && (
+                <Link
+                  href={`/incidentes/${incidente.idIncidente}/periodos/nuevo`}
+                  className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
+                >
+                  + Agregar periodo
+                </Link>
+              )}
+            </div>
+
+            {incidente.periodosOperacionales && incidente.periodosOperacionales.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {incidente.periodosOperacionales.map((periodo: any) => (
+                  <div
+                    key={periodo.idPeriodo}
+                    className="rounded border border-slate-700 bg-slate-800 p-3 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-cyan-400">
+                        Periodo {periodo.numeroPeriodo}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {new Date(periodo.fechaHoraInicio).toLocaleString()} - {new Date(periodo.fechaHoraFin).toLocaleString()}
+                      </p>
+                      {periodo.observaciones && (
+                        <p className="text-xs text-slate-500 mt-1">{periodo.observaciones}</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          if (confirm("¿Eliminar este periodo operacional?")) {
+                            const res = await fetch(`/api/periodos-operacionales/${periodo.idPeriodo}`, {
+                              method: "DELETE",
+                            });
+                            if (res.ok) {
+                              cargarDetalle();
+                            } else {
+                              alert("Error al eliminar el periodo");
+                            }
+                          }
+                        }}
+                        className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-500"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-slate-400">
+                No hay periodos operacionales registrados.
+                {incidente.estado === "ACTIVO" && (
+                  <span>
+                    {" "}
+                    <Link
+                      href={`/incidentes/${incidente.idIncidente}/periodos/nuevo`}
+                      className="text-cyan-400 hover:underline"
+                    >
+                      Agrega el primero
+                    </Link>
+                    .
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+
+          {/* SECCIÓN 2: PLAN DE ACCIÓN */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Plan de Acción del Incidente</h2>
+              {incidente.estado === "ACTIVO" && (
+                <Link
+                  href={`/incidentes/${incidente.idIncidente}/pai/nuevo`}
+                  className="rounded bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-500"
+                >
+                  + Crear Plan de Acción
+                </Link>
+              )}
+            </div>
+
+            {incidente.planesAccion && incidente.planesAccion.length > 0 ? (
+              <div className="mt-3 space-y-3">
+                {incidente.planesAccion.map((plan: any) => (
+                  <div
+                    key={plan.idPai}
+                    className="rounded border border-slate-700 bg-slate-800 p-4"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-cyan-400">
+                          Periodo {plan.periodo?.numeroPeriodo || "N/A"}
+                        </p>
+                        <p className="text-sm text-slate-400 mt-1">
+                          <span className="text-slate-500">Preparado:</span>{" "}
+                          {new Date(plan.fechaHoraPreparacion).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/incidentes/${incidente.idIncidente}/pai/${plan.idPai}/editar`}
+                          className="rounded bg-yellow-600 px-2 py-1 text-xs font-medium text-white hover:bg-yellow-500"
+                        >
+                          Editar
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            if (confirm("¿Eliminar este plan de acción?")) {
+                              const res = await fetch(`/api/planes-accion/${plan.idPai}`, {
+                                method: "DELETE",
+                              });
+                              if (res.ok) {
+                                cargarDetalle();
+                              } else {
+                                alert("Error al eliminar el plan");
+                              }
+                            }
+                          }}
+                          className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-500"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-2">
+                      <div>
+                        <span className="text-slate-500">Objetivos:</span>{" "}
+                        <span className="text-white">{plan.objetivosOperacionales}</span>
+                      </div>
+                      {plan.estrategias && (
+                        <div>
+                          <span className="text-slate-500">Estrategias:</span>{" "}
+                          <span className="text-white">{plan.estrategias}</span>
+                        </div>
+                      )}
+                      {plan.tacticas && (
+                        <div>
+                          <span className="text-slate-500">Tácticas:</span>{" "}
+                          <span className="text-white">{plan.tacticas}</span>
+                        </div>
+                      )}
+                      {plan.recursosEnLugar && (
+                        <div>
+                          <span className="text-slate-500">Recursos en lugar:</span>{" "}
+                          <span className="text-white">{plan.recursosEnLugar}</span>
+                        </div>
+                      )}
+                      {plan.recursosPorSolicitar && (
+                        <div>
+                          <span className="text-slate-500">Recursos por solicitar:</span>{" "}
+                          <span className="text-white">{plan.recursosPorSolicitar}</span>
+                        </div>
+                      )}
+                      {plan.mensajeSeguridad && (
+                        <div>
+                          <span className="text-slate-500">Mensaje de seguridad:</span>{" "}
+                          <span className="text-white">{plan.mensajeSeguridad}</span>
+                        </div>
+                      )}
+                      {plan.nombreJefePlanificacion && (
+                        <div>
+                          <span className="text-slate-500">Jefe Planificación:</span>{" "}
+                          <span className="text-white">{plan.nombreJefePlanificacion}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-slate-400">
+                No hay planes de acción registrados para este incidente.
+                {incidente.estado === "ACTIVO" && (
+                  <span>
+                    {" "}
+                    <Link
+                      href={`/incidentes/${incidente.idIncidente}/pai/nuevo`}
+                      className="text-cyan-400 hover:underline"
+                    >
+                      Crea el primero
+                    </Link>
+                    .
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+
+          {/* SECCIÓN 3: VÍCTIMAS (con reclasificación y color correcto) */}
           <div className="mt-6">
             <h2 className="text-lg font-semibold mb-3">Víctimas registradas</h2>
             {incidente.victimas && incidente.victimas.length > 0 ? (
@@ -184,6 +424,9 @@ export default function DetalleIncidentePage() {
                         Estado
                       </th>
                       <th className="px-2 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                        Hospital
+                      </th>
+                      <th className="px-2 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                         Observaciones
                       </th>
                       <th className="px-2 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
@@ -193,6 +436,7 @@ export default function DetalleIncidentePage() {
                   </thead>
                   <tbody className="divide-y divide-slate-700">
                     {incidente.victimas.map((victima: any) => {
+                      //  El historial ya viene ordenado de forma descendente (el más reciente primero)
                       const ultimoTriage = victima.historialTriage?.[0]?.clasificacion || "Sin clasificar";
                       return (
                         <tr key={victima.idVictima} className="hover:bg-slate-800/30">
@@ -217,27 +461,72 @@ export default function DetalleIncidentePage() {
                             </span>
                           </td>
                           <td className="px-2 py-1.5 text-xs">{victima.estadoAtencion}</td>
+                          <td className="px-2 py-1.5 text-xs text-slate-400">
+                            {victima.centroHospitalario || "—"}
+                          </td>
                           <td className="px-2 py-1.5 text-xs text-slate-400 max-w-xs truncate">
                             {victima.notasAdicionales || "—"}
                           </td>
                           <td className="px-2 py-1.5 text-xs">
                             <div className="flex flex-wrap gap-1">
+                              {/*  Botón Clasificar / Reclasificar (siempre disponible) */}
+                              <button
+                                onClick={async () => {
+                                  const color = prompt("Clasificación (ROJO, AMARILLO, VERDE, NEGRO):");
+                                  if (color && ["ROJO", "AMARILLO", "VERDE", "NEGRO"].includes(color)) {
+                                    const res = await fetch(`/api/victimas/${victima.idVictima}/triage`, {
+                                      method: "PATCH",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ clasificacion: color }),
+                                    });
+                                    if (res.ok) {
+                                      cargarDetalle(); // Recarga los datos
+                                    } else {
+                                      alert("Error al clasificar");
+                                    }
+                                  }
+                                }}
+                                className="rounded bg-purple-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-purple-500 whitespace-nowrap"
+                              >
+                                {victima.historialTriage?.length > 0 ? "Reclasificar" : "Clasificar"}
+                              </button>
+
+                              {/* Botón Trasladar (solo si no está trasladado) */}
                               {victima.estadoAtencion !== "TRASLADADO" && (
                                 <button
-                                  onClick={() => handleClasificar(victima.idVictima)}
-                                  className="rounded bg-purple-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-purple-500 whitespace-nowrap"
-                                >
-                                  Clasificar
-                                </button>
-                              )}
-                              {victima.estadoAtencion !== "TRASLADADO" && (
-                                <button
-                                  onClick={() => handleTrasladar(victima.idVictima)}
+                                  onClick={async () => {
+                                    const hospital = prompt("Centro hospitalario:");
+                                    if (hospital) {
+                                      const res = await fetch(`/api/victimas/${victima.idVictima}/traslado`, {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ centroHospitalario: hospital }),
+                                      });
+                                      if (res.ok) cargarDetalle();
+                                      else alert("Error al registrar traslado");
+                                    }
+                                  }}
                                   className="rounded bg-blue-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-blue-500 whitespace-nowrap"
                                 >
                                   Trasladar
                                 </button>
                               )}
+
+                              {/* Botón Eliminar */}
+                              <button
+                                onClick={async () => {
+                                  if (confirm(`¿Eliminar a "${victima.nombrePaciente || 'esta víctima'}"?`)) {
+                                    const res = await fetch(`/api/victimas/${victima.idVictima}`, {
+                                      method: "DELETE",
+                                    });
+                                    if (res.ok) cargarDetalle();
+                                    else alert("Error al eliminar");
+                                  }
+                                }}
+                                className="rounded bg-red-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-red-500 whitespace-nowrap"
+                              >
+                                Eliminar
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -251,7 +540,7 @@ export default function DetalleIncidentePage() {
             )}
           </div>
 
-          {/* ✅ BOTONES DE ACCIÓN */}
+          {/*  BOTONES DE ACCIÓN */}
           <div className="mt-6 flex gap-3 flex-wrap">
             {incidente.estado === "ACTIVO" && (
               <>
@@ -272,6 +561,12 @@ export default function DetalleIncidentePage() {
                   className="rounded bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-500"
                 >
                   Registrar víctima
+                </Link>
+                <Link
+                  href={`/incidentes/${incidente.idIncidente}/pai/nuevo`}
+                  className="rounded bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500"
+                >
+                  Plan de Acción
                 </Link>
               </>
             )}

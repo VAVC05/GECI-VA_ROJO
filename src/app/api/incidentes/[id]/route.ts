@@ -42,14 +42,30 @@ export async function GET(
         usuarioRegistro: {
           select: { nombreCompleto: true, correo: true },
         },
+        // ✅ VÍCTIMAS CON HISTORIAL ORDENADO (el más reciente primero)
         victimas: {
-          include: { historialTriage: true },
+          include: {
+            historialTriage: {
+              orderBy: { fechaHoraClasificacion: 'desc' }, // ← ¡CLAVE!
+            },
+          },
         },
         asignacionesRecurso: {
           include: { recurso: true },
         },
         formulariosSci: true,
-        periodosOperacionales: true,
+        // ✅ PERIODOS OPERACIONALES
+        periodosOperacionales: {
+          orderBy: { numeroPeriodo: 'asc' },
+        },
+        // ✅ PLANES DE ACCIÓN CON SU PERIODO
+        planesAccion: {
+          include: {
+            periodo: {
+              select: { idPeriodo: true, numeroPeriodo: true, fechaHoraInicio: true, fechaHoraFin: true },
+            },
+          },
+        },
       },
     });
 
