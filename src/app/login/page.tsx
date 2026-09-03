@@ -1,121 +1,103 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { esquemaLogin, type DatosLogin } from "@/lib/validaciones/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<DatosLogin>({
+    resolver: zodResolver(esquemaLogin),
+  });
 
-    const formData = new FormData(e.currentTarget);
-    const correo = formData.get("correo") as string;
-    const contrasena = formData.get("contrasena") as string;
+  async function onSubmit(datos: DatosLogin) {
+    setErrorGeneral(null);
+    setEnviando(true);
 
-    try {
-      const result = await signIn("credentials", {
-        correo,
-        contrasena,
-        redirect: false,
-      });
+    const resultado = await signIn("credentials", {
+      correo: datos.correo,
+      contrasena: datos.contrasena,
+      redirect: false,
+    });
 
-      if (result?.error) {
-        setError("Credenciales incorrectas");
-        setLoading(false);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
-      }
-    } catch (err) {
-      setError("Error de conexión");
-      setLoading(false);
+    setEnviando(false);
+
+    if (resultado?.error) {
+      // No decimos si fue el correo o la contraseña, por seguridad.
+      setErrorGeneral("Correo o contraseña incorrectos.");
+      return;
     }
-  };
+
+    router.push("/dashboard");
+    router.refresh();
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900 p-8 shadow-xl">
-        {/* Logos alineados a la izquierda, mismo tamaño */}
-        <div className="mb-6 flex items-center gap-4">
-          <Image
-            src="/logos/bomberos.png"
-            alt="Bomberos Metepec"
-            width={50}
-            height={50}
-            className="rounded-full"
-          />
-          <div className="h-10 w-px bg-slate-700" />
-          <Image
-            src="/logos/pc_metepec.png"
-            alt="Protección Civil Metepec"
-            width={50}
-            height={50}
-            className="rounded-full"
-          />
-        </div>
+    <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gris px-6 py-10">
+      <div className="w-full max-w-sm">
+        <h1 className="text-center text-2xl font-bold text-rojo">Inicio de sesión</h1>
 
-        <h1 className="mb-1 text-2xl font-bold text-white">GECI-VA</h1>
-        <p className="mb-6 text-sm text-slate-400">Sistema de Gestión del Comando de Incidentes</p>
-
-        {error && (
-          <div className="mb-4 rounded bg-red-900/30 p-3 text-sm text-red-300">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="mt-8 space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+        >
           <div>
-            <label htmlFor="correo" className="block text-sm font-medium text-slate-300">
-              Correo electrónico
+            <label htmlFor="correo" className="block text-sm text-gray-700">
+              Usuario
             </label>
             <input
-              type="email"
               id="correo"
-              name="correo"
-              required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
-              placeholder="admin@geci-va.mx"
+              type="email"
+              autoComplete="email"
+              {...register("correo")}
+              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none focus:border-rojo focus:ring-1 focus:ring-rojo"
             />
+            {errors.correo && (
+              <p className="mt-1 text-xs text-red-600">{errors.correo.message}</p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="contrasena" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="contrasena" className="block text-sm text-gray-700">
               Contraseña
             </label>
             <input
-              type="password"
               id="contrasena"
-              name="contrasena"
-              required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
-              placeholder="••••••••"
+              type="password"
+              autoComplete="current-password"
+              {...register("contrasena")}
+              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none focus:border-rojo focus:ring-1 focus:ring-rojo"
             />
+            {errors.contrasena && (
+              <p className="mt-1 text-xs text-red-600">{errors.contrasena.message}</p>
+            )}
           </div>
+
+          {errorGeneral && (
+            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errorGeneral}
+            </p>
+          )}
 
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full rounded-md px-4 py-2 text-sm font-medium text-white ${
-              loading
-                ? "cursor-not-allowed bg-slate-600"
-                : "bg-red-700 hover:bg-red-600" // Rojo institucional
-            }`}
+            disabled={enviando}
+            className="w-full rounded-md bg-carbon py-2 font-medium text-white transition hover:bg-carbon-oscuro disabled:opacity-50"
           >
-            {loading ? "Verificando..." : "Ingresar"}
+            {enviando ? "Entrando..." : "Ingresar"}
           </button>
         </form>
-
-        <p className="mt-4 text-center text-xs text-slate-500">
-          &copy; {new Date().getFullYear()} GECI-VA · Protección Civil y Bomberos de Metepec
-        </p>
       </div>
-    </div>
+    </main>
   );
 }

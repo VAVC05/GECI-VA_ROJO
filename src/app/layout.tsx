@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import HeaderInstitucional from "@/components/HeaderInstitucional";
 
 export const metadata: Metadata = {
   title: "GECI-VA — Coordinación de Protección Civil y Bomberos de Metepec",
@@ -11,8 +12,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">
-        <SessionProviderWrapper>{children}</SessionProviderWrapper>
+      <body className="min-h-full flex flex-col font-sans bg-gris">
+        <HeaderInstitucional />
+        <SessionProviderWrapper>
+          <div className="flex-1">{children}</div>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

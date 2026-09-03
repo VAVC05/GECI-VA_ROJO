@@ -94,7 +94,7 @@ export default function AsignarRecursoPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white p-6">
+      <main className="min-h-screen bg-gris text-gray-900 p-6">
         <p>Cargando...</p>
       </main>
     );
@@ -102,9 +102,9 @@ export default function AsignarRecursoPage() {
 
   if (!incidente) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white p-6">
+      <main className="min-h-screen bg-gris text-gray-900 p-6">
         <p className="text-red-400">Incidente no encontrado</p>
-        <Link href="/incidentes" className="text-blue-400 hover:underline mt-4 block">
+        <Link href="/incidentes" className="text-rojo hover:underline mt-4 block font-medium">
           Volver al listado
         </Link>
       </main>
@@ -112,18 +112,18 @@ export default function AsignarRecursoPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
+    <main className="min-h-screen bg-gris text-gray-900 p-6">
       <div className="mx-auto max-w-4xl">
         <Link
           href={`/incidentes/${id}`}
-          className="text-blue-400 hover:underline block mb-4"
+          className="text-rojo hover:underline block mb-4 font-medium"
         >
           ← Volver al detalle del incidente
         </Link>
 
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-          <h1 className="text-2xl font-bold">Asignar recurso</h1>
-          <p className="text-sm text-slate-400 mt-1">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <h1 className="text-2xl font-bold text-rojo">Asignar recurso</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Incidente: {incidente.folio} - {incidente.nombre}
           </p>
 
@@ -144,33 +144,33 @@ export default function AsignarRecursoPage() {
               <p>No hay recursos disponibles en este momento.</p>
               <Link
                 href="/recursos/nuevo"
-                className="text-blue-400 hover:underline block mt-2"
+                className="text-rojo hover:underline block mt-2 font-medium"
               >
                 → Registrar nuevo recurso
               </Link>
             </div>
           ) : (
             <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-700">
-                <thead className="bg-slate-800">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Nombre
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Clase
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Tipo
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Acción
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-700">
+                <tbody className="divide-y divide-gray-200">
                   {recursos.map((recurso) => (
-                    <tr key={recurso.idRecurso} className="hover:bg-slate-800/50">
+                    <tr key={recurso.idRecurso} className="hover:bg-gray-50">
                       <td className="whitespace-nowrap px-4 py-3 text-sm">
                         {recurso.nombre}
                       </td>
@@ -184,7 +184,7 @@ export default function AsignarRecursoPage() {
                         <button
                           onClick={() => handleAsignar(recurso.idRecurso)}
                           disabled={asignando}
-                          className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-500 disabled:bg-gray-500"
+                          className="rounded bg-carbon px-3 py-1 text-xs font-medium text-white hover:bg-carbon-oscuro disabled:bg-gray-400"
                         >
                           {asignando ? "Asignando..." : "Asignar"}
                         </button>

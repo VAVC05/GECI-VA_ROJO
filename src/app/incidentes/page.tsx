@@ -22,48 +22,48 @@ export default async function IncidentesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Listado de Incidentes</h1>
+        <h1 className="text-2xl font-bold text-rojo">Listado de Incidentes</h1>
         <Link
           href="/incidentes/nuevo"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
+          className="rounded-md bg-carbon px-4 py-2 text-sm font-medium text-white hover:bg-carbon-oscuro"
         >
           + Nuevo incidente
         </Link>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-lg border border-slate-800 bg-slate-900">
-        <table className="min-w-full divide-y divide-slate-700">
-          <thead className="bg-slate-800">
+      <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Folio
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Nombre
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Tipo
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Lugar
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Estado
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Registrado por
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-700">
+          <tbody className="divide-y divide-gray-200">
             {incidentes.map((inc) => (
-              <tr key={inc.idIncidente} className="hover:bg-slate-800/50">
-                <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-cyan-400">
+              <tr key={inc.idIncidente} className="hover:bg-gray-50">
+                <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-rojo">
                   {inc.folio}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-sm">
@@ -79,14 +79,14 @@ export default async function IncidentesPage() {
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                       inc.estado === "ACTIVO"
-                        ? "bg-green-900/30 text-green-300"
-                        : "bg-slate-700 text-slate-300"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-200 text-gray-700"
                     }`}
                   >
                     {inc.estado}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-400">
+                <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                   {inc.usuarioRegistro?.nombreCompleto || "N/A"}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-sm">
@@ -94,7 +94,7 @@ export default async function IncidentesPage() {
                     {/* Ver */}
                     <Link
                       href={`/incidentes/${inc.idIncidente}`}
-                      className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-500"
+                      className="rounded bg-carbon px-3 py-1 text-xs font-medium text-white hover:bg-carbon-oscuro"
                     >
                       Ver
                     </Link>
@@ -103,7 +103,7 @@ export default async function IncidentesPage() {
                     {inc.estado === "ACTIVO" && (
                       <Link
                         href={`/incidentes/${inc.idIncidente}/editar`}
-                        className="rounded bg-yellow-600 px-3 py-1 text-xs font-medium text-white hover:bg-yellow-500"
+                        className="rounded bg-gray-500 px-3 py-1 text-xs font-medium text-white hover:bg-gray-600"
                       >
                         Editar
                       </Link>

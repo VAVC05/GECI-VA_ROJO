@@ -38,7 +38,7 @@ export default function EstadisticasPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 text-white">
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
         <p>Cargando estadísticas...</p>
       </div>
     );
@@ -50,7 +50,7 @@ export default function EstadisticasPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 text-white">
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
         <p>Error al cargar estadísticas</p>
       </div>
     );
@@ -68,25 +68,25 @@ export default function EstadisticasPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
-      <h1 className="text-2xl font-bold mb-6">Estadísticas {data.anio}</h1>
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
+      <h1 className="text-2xl font-bold mb-6 text-rojo">Estadísticas {data.anio}</h1>
 
       {/* Tarjetas de métricas */}
 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-  <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-    <p className="text-sm text-slate-400">Total incidentes</p>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <p className="text-sm text-gray-500">Total incidentes</p>
     <p className="text-2xl font-bold">{data.totalIncidentes || 0}</p>
   </div>
-  <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-    <p className="text-sm text-slate-400">Víctimas atendidas</p>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <p className="text-sm text-gray-500">Víctimas atendidas</p>
     <p className="text-2xl font-bold">{data.totalVictimas || 0}</p>
   </div>
-  <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-    <p className="text-sm text-slate-400">Recursos utilizados</p>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <p className="text-sm text-gray-500">Recursos utilizados</p>
     <p className="text-2xl font-bold">{data.totalRecursosUtilizados || 0}</p>
   </div>
-  <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-    <p className="text-sm text-slate-400">Promedio atención</p>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <p className="text-sm text-gray-500">Promedio atención</p>
     <p className="text-2xl font-bold">
       {data.promedioHorasAtencion?.toFixed(1) || '0.0'} hrs
     </p>
@@ -96,8 +96,8 @@ export default function EstadisticasPage() {
       {/* Gráficas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Incidentes por tipo (Pie) */}
-        <div className="rounded-lg bg-slate-900 p-4 border border-slate-800">
-          <h2 className="text-lg font-semibold mb-4">Incidentes por tipo</h2>
+        <div className="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Incidentes por tipo</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -120,33 +120,33 @@ export default function EstadisticasPage() {
         </div>
 
         {/* Incidentes por mes (Bar) */}
-        <div className="rounded-lg bg-slate-900 p-4 border border-slate-800">
-          <h2 className="text-lg font-semibold mb-4">Incidentes por mes</h2>
+        <div className="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Incidentes por mes</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={mesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="name" stroke="#94a3b8" />
-              <YAxis stroke="#94a3b8" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="name" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
               <Tooltip />
-              <Bar dataKey="total" fill="#3b82f6" />
+              <Bar dataKey="total" fill="#b30000" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Recursos utilizados */}
-        <div className="rounded-lg bg-slate-900 p-4 border border-slate-800">
-          <h2 className="text-lg font-semibold mb-4">Recursos utilizados</h2>
-          <p className="text-3xl font-bold text-cyan-400">{data.totalRecursosUtilizados}</p>
-          <p className="text-sm text-slate-400">Asignaciones realizadas</p>
+        <div className="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Recursos utilizados</h2>
+          <p className="text-3xl font-bold text-carbon">{data.totalRecursosUtilizados}</p>
+          <p className="text-sm text-gray-500">Asignaciones realizadas</p>
         </div>
 
         {/* Tiempo promedio */}
-        <div className="rounded-lg bg-slate-900 p-4 border border-slate-800">
-          <h2 className="text-lg font-semibold mb-4">Tiempo promedio de atención</h2>
-          <p className="text-3xl font-bold text-purple-400">
+        <div className="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Tiempo promedio de atención</h2>
+          <p className="text-3xl font-bold text-carbon">
             {data.promedioHorasAtencion?.toFixed(1) || '0.0'} hrs
           </p>
-          <p className="text-sm text-slate-400">Por incidente cerrado</p>
+          <p className="text-sm text-gray-500">Por incidente cerrado</p>
         </div>
       </div>
     </div>

@@ -43,24 +43,24 @@ export default function NuevoIncidentePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="mx-auto max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Nuevo Incidente</h1>
-          <Link href="/incidentes" className="text-cyan-400 hover:underline">
+          <h1 className="text-2xl font-bold text-rojo">Nuevo Incidente</h1>
+          <Link href="/incidentes" className="text-rojo hover:underline font-medium">
             ← Volver al listado
           </Link>
         </div>
 
         {error && (
-          <div className="mb-4 rounded bg-red-900/30 p-3 text-sm text-red-300">
+          <div className="mb-4 rounded bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="nombre" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
               Nombre del incidente *
             </label>
             <input
@@ -68,13 +68,13 @@ export default function NuevoIncidentePage() {
               id="nombre"
               name="nombre"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Incendio en el Mercado Central"
             />
           </div>
 
           <div>
-            <label htmlFor="tipo" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">
               Tipo *
             </label>
             <input
@@ -82,13 +82,13 @@ export default function NuevoIncidentePage() {
               id="tipo"
               name="tipo"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: INCENDIO, RESCATE, PREHOSPITALARIO"
             />
           </div>
 
           <div>
-            <label htmlFor="lugar" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="lugar" className="block text-sm font-medium text-gray-700">
               Lugar *
             </label>
             <input
@@ -96,13 +96,13 @@ export default function NuevoIncidentePage() {
               id="lugar"
               name="lugar"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Mercado Central, Metepec"
             />
           </div>
 
           <div>
-            <label htmlFor="fechaHoraInicio" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="fechaHoraInicio" className="block text-sm font-medium text-gray-700">
               Fecha y hora de inicio *
             </label>
             <input
@@ -111,7 +111,7 @@ export default function NuevoIncidentePage() {
               name="fechaHoraInicio"
               required
               defaultValue={new Date().toISOString().slice(0, 16)}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             />
           </div>
 
@@ -121,15 +121,15 @@ export default function NuevoIncidentePage() {
               disabled={cargando}
               className={`rounded px-6 py-2 text-sm font-medium text-white ${
                 cargando
-                  ? "cursor-not-allowed bg-slate-600"
-                  : "bg-blue-600 hover:bg-blue-500"
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-carbon hover:bg-carbon-oscuro"
               }`}
             >
               {cargando ? "Guardando..." : "Guardar incidente"}
             </button>
             <Link
               href="/incidentes"
-              className="rounded bg-slate-700 px-6 py-2 text-sm font-medium text-white hover:bg-slate-600"
+              className="rounded bg-gray-200 px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
             >
               Cancelar
             </Link>

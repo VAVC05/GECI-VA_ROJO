@@ -45,24 +45,24 @@ export default function NuevoRecursoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="mx-auto max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Nuevo Recurso</h1>
-          <Link href="/recursos" className="text-cyan-400 hover:underline">
+          <h1 className="text-2xl font-bold text-rojo">Nuevo Recurso</h1>
+          <Link href="/recursos" className="text-rojo hover:underline font-medium">
             ← Volver al listado
           </Link>
         </div>
 
         {error && (
-          <div className="mb-4 rounded bg-red-900/30 p-3 text-sm text-red-300">
+          <div className="mb-4 rounded bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="nombre" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
               Nombre *
             </label>
             <input
@@ -70,20 +70,20 @@ export default function NuevoRecursoPage() {
               id="nombre"
               name="nombre"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Ambulancia UR-01"
             />
           </div>
 
           <div>
-            <label htmlFor="clase" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="clase" className="block text-sm font-medium text-gray-700">
               Clase *
             </label>
             <select
               id="clase"
               name="clase"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
               <option value="">Seleccionar clase</option>
               <option value="PERSONAL">Personal</option>
@@ -93,7 +93,7 @@ export default function NuevoRecursoPage() {
           </div>
 
           <div>
-            <label htmlFor="tipo" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">
               Tipo *
             </label>
             <input
@@ -101,39 +101,39 @@ export default function NuevoRecursoPage() {
               id="tipo"
               name="tipo"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: AMBULANCIA, BOMBERO, EXTINTOR"
             />
           </div>
 
           <div>
-            <label htmlFor="institucion" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="institucion" className="block text-sm font-medium text-gray-700">
               Institución
             </label>
             <input
               type="text"
               id="institucion"
               name="institucion"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Coordinación de Protección Civil"
             />
           </div>
 
           <div>
-            <label htmlFor="matricula" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="matricula" className="block text-sm font-medium text-gray-700">
               Matrícula
             </label>
             <input
               type="text"
               id="matricula"
               name="matricula"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: MTP-1234"
             />
           </div>
 
           <div>
-            <label htmlFor="numeroPersonas" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="numeroPersonas" className="block text-sm font-medium text-gray-700">
               Número de personas
             </label>
             <input
@@ -141,7 +141,7 @@ export default function NuevoRecursoPage() {
               id="numeroPersonas"
               name="numeroPersonas"
               min="0"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="0"
             />
           </div>
@@ -152,15 +152,15 @@ export default function NuevoRecursoPage() {
               disabled={cargando}
               className={`rounded px-6 py-2 text-sm font-medium text-white ${
                 cargando
-                  ? "cursor-not-allowed bg-slate-600"
-                  : "bg-blue-600 hover:bg-blue-500"
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-carbon hover:bg-carbon-oscuro"
               }`}
             >
               {cargando ? "Guardando..." : "Guardar recurso"}
             </button>
             <Link
               href="/recursos"
-              className="rounded bg-slate-700 px-6 py-2 text-sm font-medium text-white hover:bg-slate-600"
+              className="rounded bg-gray-200 px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
             >
               Cancelar
             </Link>

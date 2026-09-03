@@ -62,7 +62,7 @@ export default function DetalleRecursoPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white p-6">
+      <main className="min-h-screen bg-gris text-gray-900 p-6">
         <p>Cargando detalle...</p>
       </main>
     );
@@ -70,9 +70,9 @@ export default function DetalleRecursoPage() {
 
   if (!recurso) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white p-6">
+      <main className="min-h-screen bg-gris text-gray-900 p-6">
         <p>Recurso no encontrado</p>
-        <Link href="/recursos" className="text-blue-400 hover:underline">
+        <Link href="/recursos" className="text-rojo hover:underline font-medium">
           Volver al listado
         </Link>
       </main>
@@ -84,45 +84,45 @@ export default function DetalleRecursoPage() {
   );
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
+    <main className="min-h-screen bg-gris text-gray-900 p-6">
       <div className="mx-auto max-w-4xl">
-        <Link href="/recursos" className="text-blue-400 hover:underline block mb-4">
+        <Link href="/recursos" className="text-rojo hover:underline block mb-4 font-medium">
           ← Volver al listado
         </Link>
 
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-          <h1 className="text-2xl font-bold">{recurso.nombre}</h1>
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <h1 className="text-2xl font-bold text-rojo">{recurso.nombre}</h1>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-slate-400">Clase</p>
+              <p className="text-sm text-gray-500">Clase</p>
               <p>{recurso.clase}</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Tipo</p>
+              <p className="text-sm text-gray-500">Tipo</p>
               <p>{recurso.tipo}</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Institución</p>
+              <p className="text-sm text-gray-500">Institución</p>
               <p>{recurso.institucion || "N/A"}</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Matrícula</p>
+              <p className="text-sm text-gray-500">Matrícula</p>
               <p>{recurso.matricula || "N/A"}</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Número de personas</p>
+              <p className="text-sm text-gray-500">Número de personas</p>
               <p>{recurso.numeroPersonas ?? "N/A"}</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Estado</p>
+              <p className="text-sm text-gray-500">Estado</p>
               <span
                 className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                   recurso.estado === "DISPONIBLE"
-                    ? "bg-green-900/30 text-green-300"
+                    ? "bg-green-100 text-green-800"
                     : recurso.estado === "ASIGNADO"
-                    ? "bg-yellow-900/30 text-yellow-300"
-                    : "bg-red-900/30 text-red-300"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
                 {recurso.estado}
@@ -132,14 +132,14 @@ export default function DetalleRecursoPage() {
 
           {asignacionActiva && (
             <div className="mt-4 rounded border border-yellow-800 bg-yellow-950 p-3">
-              <p className="text-sm text-yellow-400">Asignado al incidente:</p>
+              <p className="text-sm text-yellow-700">Asignado al incidente:</p>
               <Link
                 href={`/incidentes/${asignacionActiva.incidente.idIncidente}`}
-                className="text-cyan-400 hover:underline"
+                className="text-rojo hover:underline font-medium"
               >
                 {asignacionActiva.incidente.folio} - {asignacionActiva.incidente.nombre}
               </Link>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 Tarea: {asignacionActiva.tareaAsignada || "Sin asignar"}
               </p>
             </div>
@@ -152,29 +152,29 @@ export default function DetalleRecursoPage() {
                 {recurso.asignaciones.map((asignacion) => (
                   <div
                     key={asignacion.idAsignacion}
-                    className="rounded border border-slate-700 bg-slate-800 p-3 text-sm"
+                    className="rounded border border-gray-300 bg-gray-50 p-3 text-sm text-gray-800"
                   >
                     <p>
-                      <span className="text-slate-400">Incidente:</span>{" "}
+                      <span className="text-gray-500">Incidente:</span>{" "}
                       <Link
                         href={`/incidentes/${asignacion.incidente.idIncidente}`}
-                        className="text-cyan-400 hover:underline"
+                        className="text-rojo hover:underline font-medium"
                       >
                         {asignacion.incidente.folio}
                       </Link>
                     </p>
                     <p>
-                      <span className="text-slate-400">Asignado:</span>{" "}
+                      <span className="text-gray-500">Asignado:</span>{" "}
                       {new Date(asignacion.fechaHoraAsignacion).toLocaleString()}
                     </p>
                     {asignacion.fechaHoraDesmovilizacion && (
                       <p>
-                        <span className="text-slate-400">Desmovilizado:</span>{" "}
+                        <span className="text-gray-500">Desmovilizado:</span>{" "}
                         {new Date(asignacion.fechaHoraDesmovilizacion).toLocaleString()}
                       </p>
                     )}
                     {asignacion.observacionesDesmovilizacion && (
-                      <p className="text-slate-400">
+                      <p className="text-gray-500">
                         Observaciones: {asignacion.observacionesDesmovilizacion}
                       </p>
                     )}

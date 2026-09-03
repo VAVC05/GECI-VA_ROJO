@@ -18,40 +18,13 @@ export default function NuevaVictimaPage() {
     setCargando(true);
 
     const formData = new FormData(e.currentTarget);
-    const nombrePaciente = (formData.get("nombrePaciente") as string)?.trim() || "";
-    const sexo = formData.get("sexo") as string;
-    const edad = parseInt(formData.get("edad") as string) || undefined;
-    const lugarRegistro = formData.get("lugarRegistro") as string;
-    const notasAdicionales = (formData.get("notasAdicionales") as string)?.trim() || undefined;
-
-    // VALIDACIÓN: Nombre no puede estar vacío
-    if (!nombrePaciente) {
-      setError("El nombre del paciente es obligatorio");
-      setCargando(false);
-      return;
-    }
-
-    // VALIDACIÓN: Nombre no puede ser solo números
-    if (/^\d+$/.test(nombrePaciente)) {
-      setError("El nombre del paciente no puede ser solo números");
-      setCargando(false);
-      return;
-    }
-
-    // VALIDACIÓN: Nombre no puede tener menos de 2 caracteres
-    if (nombrePaciente.length < 2) {
-      setError("El nombre del paciente debe tener al menos 2 caracteres");
-      setCargando(false);
-      return;
-    }
-
     const data = {
       idIncidente: parseInt(id),
-      nombrePaciente,
-      sexo,
-      edad,
-      lugarRegistro,
-      notasAdicionales,
+      nombrePaciente: (formData.get("nombrePaciente") as string) || undefined,
+      sexo: formData.get("sexo") as string,
+      edad: parseInt(formData.get("edad") as string) || undefined,
+      lugarRegistro: formData.get("lugarRegistro") as string,
+      notasAdicionales: (formData.get("notasAdicionales") as string) || undefined,
     };
 
     try {
@@ -75,46 +48,44 @@ export default function NuevaVictimaPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="mx-auto max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Registrar nueva víctima</h1>
-          <Link href={`/incidentes/${id}`} className="text-cyan-400 hover:underline">
+          <h1 className="text-2xl font-bold text-rojo">Registrar nueva víctima</h1>
+          <Link href={`/incidentes/${id}`} className="text-rojo hover:underline font-medium">
             ← Volver al detalle
           </Link>
         </div>
 
         {error && (
-          <div className="mb-4 rounded bg-red-900/30 p-3 text-sm text-red-300">
+          <div className="mb-4 rounded bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="nombrePaciente" className="block text-sm font-medium text-slate-300">
-              Nombre del paciente *
+            <label htmlFor="nombrePaciente" className="block text-sm font-medium text-gray-700">
+              Nombre del paciente
             </label>
             <input
               type="text"
               id="nombrePaciente"
               name="nombrePaciente"
-              required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
-              placeholder="Ej: Juan Pérez"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              placeholder="Ej: Juan Pérez (opcional)"
             />
-            <p className="mt-1 text-xs text-slate-500">No puede estar vacío ni ser solo números</p>
           </div>
 
           <div>
-            <label htmlFor="sexo" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="sexo" className="block text-sm font-medium text-gray-700">
               Sexo *
             </label>
             <select
               id="sexo"
               name="sexo"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
               <option value="">Seleccionar sexo</option>
               <option value="MASCULINO">Masculino</option>
@@ -124,7 +95,7 @@ export default function NuevaVictimaPage() {
           </div>
 
           <div>
-            <label htmlFor="edad" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="edad" className="block text-sm font-medium text-gray-700">
               Edad
             </label>
             <input
@@ -132,20 +103,20 @@ export default function NuevaVictimaPage() {
               id="edad"
               name="edad"
               min="0"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: 35"
             />
           </div>
 
           <div>
-            <label htmlFor="lugarRegistro" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="lugarRegistro" className="block text-sm font-medium text-gray-700">
               Lugar de registro *
             </label>
             <select
               id="lugarRegistro"
               name="lugarRegistro"
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
               <option value="">Seleccionar lugar</option>
               <option value="ACV">ACV (Área de Concentración de Víctimas)</option>
@@ -155,14 +126,14 @@ export default function NuevaVictimaPage() {
           </div>
 
           <div>
-            <label htmlFor="notasAdicionales" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="notasAdicionales" className="block text-sm font-medium text-gray-700">
               Notas adicionales
             </label>
             <textarea
               id="notasAdicionales"
               name="notasAdicionales"
               rows={3}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Información adicional sobre la víctima..."
             />
           </div>
@@ -173,15 +144,15 @@ export default function NuevaVictimaPage() {
               disabled={cargando}
               className={`rounded px-6 py-2 text-sm font-medium text-white ${
                 cargando
-                  ? "cursor-not-allowed bg-slate-600"
-                  : "bg-blue-600 hover:bg-blue-500"
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-carbon hover:bg-carbon-oscuro"
               }`}
             >
               {cargando ? "Guardando..." : "Registrar víctima"}
             </button>
             <Link
               href={`/incidentes/${id}`}
-              className="rounded bg-slate-700 px-6 py-2 text-sm font-medium text-white hover:bg-slate-600"
+              className="rounded bg-gray-200 px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
             >
               Cancelar
             </Link>
