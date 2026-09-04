@@ -9,6 +9,18 @@ interface RolOrganizacion {
   nombre: string;
 }
 
+interface PlanComunicaciones {
+  sistema: string;
+  canales: string;
+  equipos: string;
+}
+
+interface PlanMedico {
+  instalaciones: string;
+  hospitales: string;
+  personal: string;
+}
+
 export default function EditarIncidentePage() {
   const params = useParams();
   const router = useRouter();
@@ -34,6 +46,8 @@ export default function EditarIncidentePage() {
   const [mensajeSeguridad, setMensajeSeguridad] = useState("");
   const [canalesComunicacion, setCanalesComunicacion] = useState("");
   const [organizacionSCI, setOrganizacionSCI] = useState<RolOrganizacion[]>([]);
+  const [planComunicaciones, setPlanComunicaciones] = useState<PlanComunicaciones>({ sistema: "", canales: "", equipos: "" });
+  const [planMedico, setPlanMedico] = useState<PlanMedico>({ instalaciones: "", hospitales: "", personal: "" });
 
   // Cargar datos
   useEffect(() => {
@@ -61,6 +75,8 @@ export default function EditarIncidentePage() {
           setMensajeSeguridad(data.mensajeSeguridad || "");
           setCanalesComunicacion(data.canalesComunicacion || "");
           setOrganizacionSCI(data.organizacionSCI || []);
+          setPlanComunicaciones(data.planComunicaciones || { sistema: "", canales: "", equipos: "" });
+          setPlanMedico(data.planMedico || { instalaciones: "", hospitales: "", personal: "" });
           setLoading(false);
         })
         .catch((err) => {
@@ -90,6 +106,8 @@ export default function EditarIncidentePage() {
       mensajeSeguridad,
       canalesComunicacion,
       organizacionSCI,
+      planComunicaciones,
+      planMedico,
     };
 
     try {
@@ -388,6 +406,88 @@ export default function EditarIncidentePage() {
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* Sección 4: SCI-205 Plan de Comunicaciones */}
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-lg font-semibold text-gray-800">SCI-205 - Plan de Comunicaciones</h2>
+            <p className="text-sm text-gray-500 mt-1">Define los sistemas, canales y equipos de comunicación para el incidente.</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-2">
+              <div>
+                <label htmlFor="comSistema" className="block text-sm font-medium text-gray-700">Sistema/Equipo</label>
+                <input
+                  type="text"
+                  id="comSistema"
+                  value={planComunicaciones.sistema}
+                  onChange={(e) => setPlanComunicaciones({ ...planComunicaciones, sistema: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. Radio Motorola, Teléfono Satelital"
+                />
+              </div>
+              <div>
+                <label htmlFor="comCanales" className="block text-sm font-medium text-gray-700">Canales/Frecuencias</label>
+                <input
+                  type="text"
+                  id="comCanales"
+                  value={planComunicaciones.canales}
+                  onChange={(e) => setPlanComunicaciones({ ...planComunicaciones, canales: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. Canal 1, Frecuencia 151.XXX"
+                />
+              </div>
+              <div>
+                <label htmlFor="comEquipos" className="block text-sm font-medium text-gray-700">Equipos disponibles</label>
+                <input
+                  type="text"
+                  id="comEquipos"
+                  value={planComunicaciones.equipos}
+                  onChange={(e) => setPlanComunicaciones({ ...planComunicaciones, equipos: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. 10 radios portátiles, 2 bases fijas"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Sección 5: SCI-206 Plan Médico */}
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-lg font-semibold text-gray-800">SCI-206 - Plan Médico</h2>
+            <p className="text-sm text-gray-500 mt-1">Define las instalaciones médicas, hospitales de derivación y personal disponible.</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-2">
+              <div>
+                <label htmlFor="medInstalaciones" className="block text-sm font-medium text-gray-700">Instalaciones médicas</label>
+                <input
+                  type="text"
+                  id="medInstalaciones"
+                  value={planMedico.instalaciones}
+                  onChange={(e) => setPlanMedico({ ...planMedico, instalaciones: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. Puesto de socorro en sitio, Clínica móvil"
+                />
+              </div>
+              <div>
+                <label htmlFor="medHospitales" className="block text-sm font-medium text-gray-700">Hospitales de derivación</label>
+                <input
+                  type="text"
+                  id="medHospitales"
+                  value={planMedico.hospitales}
+                  onChange={(e) => setPlanMedico({ ...planMedico, hospitales: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. Hospital General, IMSS, ISSSTE"
+                />
+              </div>
+              <div>
+                <label htmlFor="medPersonal" className="block text-sm font-medium text-gray-700">Personal médico</label>
+                <input
+                  type="text"
+                  id="medPersonal"
+                  value={planMedico.personal}
+                  onChange={(e) => setPlanMedico({ ...planMedico, personal: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+                  placeholder="Ej. 3 Médicos, 5 Paramédicos, 2 Enfermeras"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-2">

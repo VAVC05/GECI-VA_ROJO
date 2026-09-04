@@ -17,10 +17,11 @@ const updateIncidentSchema = z.object({
   rutaEgreso: z.string().optional(),
   mensajeSeguridad: z.string().optional(),
   canalesComunicacion: z.string().optional(),
-  organizacionSCI: z.any().optional(), 
+  organizacionSCI: z.any().optional(),
+  planComunicaciones: z.any().optional(), // Nuevo
+  planMedico: z.any().optional(),         // Nuevo
 });
 
-// GET /api/incidentes/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,11 +44,10 @@ export async function GET(
         usuarioRegistro: {
           select: { nombreCompleto: true, correo: true },
         },
-        // ✅ VÍCTIMAS CON HISTORIAL ORDENADO (el más reciente primero)
         victimas: {
           include: {
             historialTriage: {
-              orderBy: { fechaHoraClasificacion: 'desc' }, // ← ¡CLAVE!
+              orderBy: { fechaHoraClasificacion: 'desc' },
             },
           },
         },
@@ -55,11 +55,9 @@ export async function GET(
           include: { recurso: true },
         },
         formulariosSci: true,
-        // ✅ PERIODOS OPERACIONALES
         periodosOperacionales: {
           orderBy: { numeroPeriodo: 'asc' },
         },
-        // ✅ PLANES DE ACCIÓN CON SU PERIODO
         planesAccion: {
           include: {
             periodo: {
@@ -84,7 +82,6 @@ export async function GET(
   }
 }
 
-// PUT /api/incidentes/[id]
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -111,6 +108,7 @@ export async function PUT(
 
     const body = await request.json();
     const result = updateIncidentSchema.safeParse(body);
+
     if (!result.success) {
       return NextResponse.json(
         { error: 'Datos inválidos', details: result.error.issues },
@@ -121,9 +119,11 @@ export async function PUT(
     const existente = await prisma.incidente.findUnique({
       where: { idIncidente: idNumero },
     });
+
     if (!existente) {
       return NextResponse.json({ error: 'Incidente no encontrado' }, { status: 404 });
     }
+
     if (existente.estado !== 'ACTIVO') {
       return NextResponse.json(
         { error: 'Solo se pueden editar incidentes activos' },
@@ -149,7 +149,6 @@ export async function PUT(
   }
 }
 
-// PATCH /api/incidentes/[id]/cerrar
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -176,6 +175,7 @@ export async function PATCH(
 
     const body = await request.json();
     const { observaciones } = body;
+
     if (!observaciones || observaciones.trim().length === 0) {
       return NextResponse.json(
         { error: 'Las observaciones de cierre son obligatorias' },
@@ -186,9 +186,11 @@ export async function PATCH(
     const existente = await prisma.incidente.findUnique({
       where: { idIncidente: idNumero },
     });
+
     if (!existente) {
       return NextResponse.json({ error: 'Incidente no encontrado' }, { status: 404 });
     }
+
     if (existente.estado !== 'ACTIVO') {
       return NextResponse.json(
         { error: 'El incidente ya está cerrado o cancelado' },

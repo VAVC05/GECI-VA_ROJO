@@ -74,8 +74,10 @@ model Incidente {
   idUsuarioCierre      Int?            @map("id_usuario_cierre")
   fechaModificacion    DateTime        @updatedAt @map("fecha_modificacion")
 
-  // Nuevo campo para la organización del SCI (flexible)
+  // Campos para SCI (Organización, Comunicaciones y Médico)
   organizacionSCI      Json?           @map("organizacion_sci")
+  planComunicaciones   Json?           @map("plan_comunicaciones")   // Nuevo
+  planMedico           Json?           @map("plan_medico")           // Nuevo
 
   usuarioRegistro Usuario  @relation("IncidenteRegistradoPor", fields: [idUsuarioRegistro], references: [idUsuario])
   usuarioCierre   Usuario? @relation("IncidenteCerradoPor", fields: [idUsuarioCierre], references: [idUsuario])

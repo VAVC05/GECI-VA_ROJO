@@ -106,7 +106,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
     });
 
     // ============================================================
-    // SECCIÓN 2: ORGANIZACIÓN DEL SCI (organigrama)
+    // SECCIÓN 2: ORGANIZACIÓN DEL SCI (organigrama con ASCII)
     // ============================================================
     if (incidente.organizacionSCI && incidente.organizacionSCI.length > 0) {
       if (y > 240) {
@@ -121,7 +121,8 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       doc.setTextColor(0, 0, 0);
 
       incidente.organizacionSCI.forEach((item: any, idx: number) => {
-        const prefix = idx === 0 ? "└──" : "├──";
+        // Usar caracteres ASCII para compatibilidad con jsPDF
+        const prefix = idx === 0 ? "+--" : "|--";
         doc.text(`${prefix} ${item.rol}: ${item.nombre}`, 14, y);
         y += 5;
         if (y > 270) {
@@ -190,7 +191,69 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
     }
 
     // ============================================================
-    // SECCIÓN 4: SCI-211 - REGISTRO DE RECURSOS
+    // SECCIÓN 4: SCI-205 - PLAN DE COMUNICACIONES
+    // ============================================================
+    if (incidente.planComunicaciones && (incidente.planComunicaciones.sistema || incidente.planComunicaciones.canales || incidente.planComunicaciones.equipos)) {
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
+      doc.setTextColor(...ROJO_INSTITUCIONAL);
+      doc.text("4. SCI-205 - Plan de Comunicaciones", 14, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      const datosCom = [
+        ["Sistema/Equipo:", incidente.planComunicaciones.sistema || "—"],
+        ["Canales/Frecuencias:", incidente.planComunicaciones.canales || "—"],
+        ["Equipos disponibles:", incidente.planComunicaciones.equipos || "—"],
+      ];
+      datosCom.forEach(([label, value]) => {
+        doc.text(`${label} ${value}`, 14, y);
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      y += 4;
+    }
+
+    // ============================================================
+    // SECCIÓN 5: SCI-206 - PLAN MÉDICO
+    // ============================================================
+    if (incidente.planMedico && (incidente.planMedico.instalaciones || incidente.planMedico.hospitales || incidente.planMedico.personal)) {
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
+      doc.setTextColor(...ROJO_INSTITUCIONAL);
+      doc.text("5. SCI-206 - Plan Médico", 14, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      const datosMed = [
+        ["Instalaciones médicas:", incidente.planMedico.instalaciones || "—"],
+        ["Hospitales de derivación:", incidente.planMedico.hospitales || "—"],
+        ["Personal médico:", incidente.planMedico.personal || "—"],
+      ];
+      datosMed.forEach(([label, value]) => {
+        doc.text(`${label} ${value}`, 14, y);
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      y += 4;
+    }
+
+    // ============================================================
+    // SECCIÓN 6: SCI-211 - REGISTRO DE RECURSOS
     // ============================================================
     if (incidente.asignacionesRecurso && incidente.asignacionesRecurso.length > 0) {
       if (y > 200) {
@@ -199,7 +262,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       }
       doc.setFontSize(13);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
-      doc.text("4. SCI-211 - Registro de Recursos", 14, y);
+      doc.text("6. SCI-211 - Registro de Recursos", 14, y);
       y += 6;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
@@ -227,7 +290,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
     }
 
     // ============================================================
-    // SECCIÓN 5: SCI-207 - REGISTRO DE VÍCTIMAS
+    // SECCIÓN 7: SCI-207 - REGISTRO DE VÍCTIMAS
     // ============================================================
     if (incidente.victimas && incidente.victimas.length > 0) {
       if (y > 200) {
@@ -236,7 +299,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       }
       doc.setFontSize(13);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
-      doc.text("5. SCI-207 - Registro de Víctimas", 14, y);
+      doc.text("7. SCI-207 - Registro de Víctimas", 14, y);
       y += 6;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
@@ -299,7 +362,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
     }
 
     // ============================================================
-    // SECCIÓN 6: PERIODOS OPERACIONALES
+    // SECCIÓN 8: PERIODOS OPERACIONALES
     // ============================================================
     if (incidente.periodosOperacionales && incidente.periodosOperacionales.length > 0) {
       if (y > 200) {
@@ -308,7 +371,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       }
       doc.setFontSize(13);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
-      doc.text("6. Periodos Operacionales", 14, y);
+      doc.text("8. Periodos Operacionales", 14, y);
       y += 6;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);

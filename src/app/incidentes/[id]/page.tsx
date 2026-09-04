@@ -29,6 +29,8 @@ interface Incidente {
   mensajeSeguridad: string | null;
   canalesComunicacion: string | null;
   organizacionSCI?: any[];
+  planComunicaciones?: any;
+  planMedico?: any;
   victimas?: any[];
   asignacionesRecurso?: any[];
   periodosOperacionales?: any[];
@@ -138,9 +140,7 @@ export default function DetalleIncidentePage() {
             </div>
           </div>
 
-          {/* ============================================================
-              INFORMACIÓN ADICIONAL
-              ============================================================ */}
+          {/* Información adicional */}
           <div className="mt-6 border-t border-gray-200 pt-4">
             <h3 className="text-sm font-medium text-gray-500 mb-2">Información adicional</h3>
             <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
@@ -201,22 +201,56 @@ export default function DetalleIncidentePage() {
             </div>
           </div>
 
-          {/* ============================================================
-              ORGANIZACIÓN DEL SCI (organigrama)
-              ============================================================ */}
+          {/* Organización del SCI (organigrama con formato árbol) */}
           {incidente.organizacionSCI && incidente.organizacionSCI.length > 0 && (
             <div className="mt-6 border-t border-gray-200 pt-4">
               <h3 className="text-sm font-medium text-gray-500 mb-2">Organización de la Emergencia (SCI)</h3>
               <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                <div className="font-mono text-sm text-gray-800 whitespace-pre">
+                <div className="font-mono text-sm text-gray-800">
                   {incidente.organizacionSCI.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <span className="text-gray-400">{idx === 0 ? "└──" : "    ├──"}</span>
+                      <span className="text-gray-400">{idx === 0 ? "└──" : "├──"}</span>
                       <span className="font-medium">{item.rol}:</span>
                       <span>{item.nombre}</span>
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* SCI-205 Plan de Comunicaciones */}
+          {incidente.planComunicaciones && (incidente.planComunicaciones.sistema || incidente.planComunicaciones.canales || incidente.planComunicaciones.equipos) && (
+            <div className="mt-6 border-t border-gray-200 pt-4">
+              <h3 className="text-sm font-medium text-gray-500 mb-2">SCI-205 - Plan de Comunicaciones</h3>
+              <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3 bg-gray-50 p-3 rounded border border-gray-200">
+                {incidente.planComunicaciones.sistema && (
+                  <div><span className="text-gray-500">Sistema/Equipo:</span> <span>{incidente.planComunicaciones.sistema}</span></div>
+                )}
+                {incidente.planComunicaciones.canales && (
+                  <div><span className="text-gray-500">Canales/Frecuencias:</span> <span>{incidente.planComunicaciones.canales}</span></div>
+                )}
+                {incidente.planComunicaciones.equipos && (
+                  <div><span className="text-gray-500">Equipos disponibles:</span> <span>{incidente.planComunicaciones.equipos}</span></div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* SCI-206 Plan Médico */}
+          {incidente.planMedico && (incidente.planMedico.instalaciones || incidente.planMedico.hospitales || incidente.planMedico.personal) && (
+            <div className="mt-6 border-t border-gray-200 pt-4">
+              <h3 className="text-sm font-medium text-gray-500 mb-2">SCI-206 - Plan Médico</h3>
+              <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3 bg-gray-50 p-3 rounded border border-gray-200">
+                {incidente.planMedico.instalaciones && (
+                  <div><span className="text-gray-500">Instalaciones médicas:</span> <span>{incidente.planMedico.instalaciones}</span></div>
+                )}
+                {incidente.planMedico.hospitales && (
+                  <div><span className="text-gray-500">Hospitales de derivación:</span> <span>{incidente.planMedico.hospitales}</span></div>
+                )}
+                {incidente.planMedico.personal && (
+                  <div><span className="text-gray-500">Personal médico:</span> <span>{incidente.planMedico.personal}</span></div>
+                )}
               </div>
             </div>
           )}
@@ -228,9 +262,7 @@ export default function DetalleIncidentePage() {
             </div>
           )}
 
-          {/* ============================================================
-              PERIODOS OPERACIONALES
-              ============================================================ */}
+          {/* Periodos operacionales */}
           <div className="mt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">Periodos Operacionales</h2>
@@ -303,9 +335,7 @@ export default function DetalleIncidentePage() {
             )}
           </div>
 
-          {/* ============================================================
-              PLAN DE ACCIÓN
-              ============================================================ */}
+          {/* Plan de Acción */}
           <div className="mt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">Plan de Acción del Incidente</h2>
@@ -427,9 +457,7 @@ export default function DetalleIncidentePage() {
             )}
           </div>
 
-          {/* ============================================================
-              VÍCTIMAS
-              ============================================================ */}
+          {/* Víctimas */}
           <div className="mt-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Víctimas registradas</h2>
             {incidente.victimas && incidente.victimas.length > 0 ? (
@@ -574,9 +602,7 @@ export default function DetalleIncidentePage() {
             )}
           </div>
 
-          {/* ============================================================
-              BOTONES DE ACCIÓN (SIN SCI-201)
-              ============================================================ */}
+          {/* BOTONES DE ACCIÓN */}
           <div className="mt-6 flex gap-3 flex-wrap">
             {incidente.estado === "ACTIVO" && (
               <>
