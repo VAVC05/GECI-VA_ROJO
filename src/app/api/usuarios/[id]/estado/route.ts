@@ -51,8 +51,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // No permitir desactivar al propio administrador (seguridad)
-    if (idNumero === session.user.id && result.data.estado === false) {
+    //  CORREGIDO: usar idUsuario en lugar de id
+    if (idNumero === session.user.idUsuario && result.data.estado === false) {
       return NextResponse.json(
         { error: 'No puedes desactivar tu propia cuenta' },
         { status: 400 }

@@ -27,8 +27,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    // Solo el propio usuario puede cambiar su contraseña (o el Administrador)
-    if (session.user?.id !== idNumero && session.user?.rol !== 'Administrador') {
+    // ✅ CORREGIDO: usar idUsuario en lugar de id
+    if (session.user?.idUsuario !== idNumero && session.user?.rol !== 'Administrador') {
       return NextResponse.json(
         { error: 'No tienes permisos para cambiar esta contraseña' },
         { status: 403 }

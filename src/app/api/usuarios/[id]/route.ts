@@ -21,8 +21,6 @@ export async function GET(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Solo Administrador puede ver detalle de otros usuarios
-    // Pero un usuario puede ver su propio detalle (para perfil)
     const { id } = await params;
     const idNumero = parseInt(id);
     if (isNaN(idNumero)) {
@@ -51,8 +49,8 @@ export async function GET(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // Si el usuario no es Administrador y no es el mismo usuario, denegar
-    if (session.user?.rol !== 'Administrador' && session.user?.id !== idNumero) {
+    // ✅ CORREGIDO: usar idUsuario en lugar de id
+    if (session.user?.rol !== 'Administrador' && session.user?.idUsuario !== idNumero) {
       return NextResponse.json(
         { error: 'No tienes permisos para ver este usuario' },
         { status: 403 }
@@ -80,7 +78,6 @@ export async function PUT(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Solo Administrador puede editar usuarios
     if (session.user?.rol !== 'Administrador') {
       return NextResponse.json(
         { error: 'No tienes permisos para editar usuarios' },
@@ -112,7 +109,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // Si se cambia el rol, verificar que existe
     if (result.data.idRol) {
       const rolExistente = await prisma.rol.findUnique({
         where: { idRol: result.data.idRol },
@@ -153,9 +149,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/usuarios/[id] - Eliminar usuario (borrado físico, solo Administrador)
-// Nota: En lugar de borrar físicamente, recomendamos desactivar (PATCH /estado)
-// Pero incluimos DELETE por si se necesita.
+// DELETE /api/usuarios/[id] - Eliminar usuario (solo Administrador)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -179,8 +173,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    // No permitir eliminar al propio administrador (seguridad)
-    if (idNumero === session.user.id) {
+    //  CORREGIDO: usar idUsuario en lugar de id
+    if (idNumero === session.user.idUsuario) {
       return NextResponse.json(
         { error: 'No puedes eliminar tu propia cuenta' },
         { status: 400 }

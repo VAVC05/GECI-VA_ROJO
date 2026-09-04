@@ -67,8 +67,8 @@ export default function AdminUsuariosPage() {
   };
 
   const eliminarUsuario = async (id: number, nombre: string) => {
-    // No permitir eliminar al propio usuario
-    if (id === session?.user?.id) {
+    // ✅ CORREGIDO: usar idUsuario en lugar de id
+    if (id === session?.user?.idUsuario) {
       alert("No puedes eliminar tu propia cuenta.");
       return;
     }
