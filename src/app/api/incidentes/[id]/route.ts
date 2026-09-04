@@ -17,6 +17,7 @@ const updateIncidentSchema = z.object({
   rutaEgreso: z.string().optional(),
   mensajeSeguridad: z.string().optional(),
   canalesComunicacion: z.string().optional(),
+  organizacionSCI: z.any().optional(), 
 });
 
 // GET /api/incidentes/[id]

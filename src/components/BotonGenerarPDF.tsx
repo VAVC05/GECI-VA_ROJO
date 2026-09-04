@@ -7,7 +7,6 @@ interface BotonGenerarPDFProps {
   incidente: any;
 }
 
-// Rojo institucional GECI-VA (Protección Civil y Bomberos de Metepec)
 const ROJO_INSTITUCIONAL: [number, number, number] = [179, 0, 0];
 
 async function cargarImagenBase64(url: string): Promise<string> {
@@ -25,7 +24,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
   const generarPDF = async () => {
     const doc = new jsPDF();
 
-    // --- Encabezado institucional: logos alineados a la izquierda, mismo tamaño ---
+    // Encabezado
     try {
       const [logoPc, logoBomberos] = await Promise.all([
         cargarImagenBase64("/logos/pc_metepec.png"),
@@ -33,11 +32,8 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       ]);
       doc.addImage(logoPc, "PNG", 14, 8, 14, 14);
       doc.addImage(logoBomberos, "PNG", 30, 8, 14, 14);
-    } catch {
-      // Si los logos no cargan, el reporte se genera igual sin ellos.
-    }
+    } catch {}
 
-    // --- Título ---
     doc.setFontSize(16);
     doc.setTextColor(...ROJO_INSTITUCIONAL);
     doc.text("GECI-VA", 48, 15);
@@ -52,12 +48,21 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
     doc.setTextColor(...ROJO_INSTITUCIONAL);
     doc.text(`Reporte de Incidente - ${incidente.folio}`, 14, 35);
 
-    // --- Información general ---
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
     let y = 45;
+    const lineHeight = 7;
 
-    const info = [
+    // ============================================================
+    // SECCIÓN 1: SCI-201 - RESUMEN DEL INCIDENTE
+    // ============================================================
+    doc.setFontSize(13);
+    doc.setTextColor(...ROJO_INSTITUCIONAL);
+    doc.text("1. SCI-201 - Resumen del Incidente", 14, y);
+    y += 6;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+
+    const infoGeneral = [
+      ["Folio:", incidente.folio],
       ["Nombre:", incidente.nombre],
       ["Tipo:", incidente.tipo],
       ["Lugar:", incidente.lugar],
@@ -65,25 +70,136 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
       ["Fecha de inicio:", new Date(incidente.fechaHoraInicio).toLocaleString()],
     ];
     if (incidente.fechaHoraCierre) {
-      info.push(["Fecha de cierre:", new Date(incidente.fechaHoraCierre).toLocaleString()]);
+      infoGeneral.push(["Fecha de cierre:", new Date(incidente.fechaHoraCierre).toLocaleString()]);
     }
-    info.push(["Registrado por:", incidente.usuarioRegistro?.nombreCompleto || "N/A"]);
+    infoGeneral.push(["Registrado por:", incidente.usuarioRegistro?.nombreCompleto || "N/A"]);
+
+    const adicionales = [
+      ["Amenazas presentes:", incidente.amenazasPresentes],
+      ["Áreas afectadas:", incidente.areasAfectadas],
+      ["Objetivo inicial:", incidente.objetivoInicial],
+      ["Ubicación Puesto de Comando:", incidente.ubicacionPc],
+      ["Ubicación Área de Espera:", incidente.ubicacionAe],
+      ["Ruta de ingreso:", incidente.rutaIngreso],
+      ["Ruta de egreso:", incidente.rutaEgreso],
+      ["Mensaje de seguridad:", incidente.mensajeSeguridad],
+      ["Canales de comunicación:", incidente.canalesComunicacion],
+    ];
+
+    const todosCampos = [...infoGeneral];
+    adicionales.forEach(([label, value]) => {
+      if (value) todosCampos.push([label, value]);
+    });
     if (incidente.observacionesCierre) {
-      info.push(["Observaciones de cierre:", incidente.observacionesCierre]);
+      todosCampos.push(["Observaciones de cierre:", incidente.observacionesCierre]);
     }
 
-    info.forEach(([label, value]) => {
+    todosCampos.forEach(([label, value]) => {
       doc.text(`${label} ${value}`, 14, y);
-      y += 8;
+      y += lineHeight;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+      }
     });
 
-    y += 4;
-
-    // --- Recursos asignados (tabla) ---
-    if (incidente.asignacionesRecurso && incidente.asignacionesRecurso.length > 0) {
-      doc.setFontSize(14);
+    // ============================================================
+    // SECCIÓN 2: ORGANIZACIÓN DEL SCI (organigrama)
+    // ============================================================
+    if (incidente.organizacionSCI && incidente.organizacionSCI.length > 0) {
+      if (y > 240) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
-      doc.text("Recursos asignados:", 14, y);
+      doc.text("2. Organización de la Emergencia (SCI)", 14, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      incidente.organizacionSCI.forEach((item: any, idx: number) => {
+        const prefix = idx === 0 ? "└──" : "├──";
+        doc.text(`${prefix} ${item.rol}: ${item.nombre}`, 14, y);
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      y += 4;
+    }
+
+    // ============================================================
+    // SECCIÓN 3: SCI-202 - PLAN DE ACCIÓN
+    // ============================================================
+    if (incidente.planesAccion && incidente.planesAccion.length > 0) {
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
+      doc.setTextColor(...ROJO_INSTITUCIONAL);
+      doc.text("3. SCI-202 - Plan de Acción", 14, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      incidente.planesAccion.forEach((plan: any, index: number) => {
+        if (y > 240) {
+          doc.addPage();
+          y = 20;
+          doc.setFontSize(13);
+          doc.setTextColor(...ROJO_INSTITUCIONAL);
+          doc.text("Plan de Acción (continuación)", 14, y);
+          y += 6;
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+        }
+
+        const periodoNum = plan.periodo?.numeroPeriodo || "N/A";
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Plan ${index + 1} - Periodo ${periodoNum}`, 14, y);
+        y += 5;
+
+        const datosPlan = [
+          ["Objetivos:", plan.objetivosOperacionales],
+          ["Estrategias:", plan.estrategias || "—"],
+          ["Tácticas:", plan.tacticas || "—"],
+          ["Recursos en lugar:", plan.recursosEnLugar || "—"],
+          ["Recursos por solicitar:", plan.recursosPorSolicitar || "—"],
+          ["Mensaje de seguridad:", plan.mensajeSeguridad || "—"],
+          ["Jefe de Planificación:", plan.nombreJefePlanificacion || "—"],
+          ["Preparado:", new Date(plan.fechaHoraPreparacion).toLocaleString()],
+        ];
+        datosPlan.forEach(([label, value]) => {
+          doc.text(`${label} ${value}`, 16, y);
+          y += 5;
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+          }
+        });
+        y += 2;
+      });
+    }
+
+    // ============================================================
+    // SECCIÓN 4: SCI-211 - REGISTRO DE RECURSOS
+    // ============================================================
+    if (incidente.asignacionesRecurso && incidente.asignacionesRecurso.length > 0) {
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
+      doc.setTextColor(...ROJO_INSTITUCIONAL);
+      doc.text("4. SCI-211 - Registro de Recursos", 14, y);
       y += 6;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
@@ -93,32 +209,40 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
         asignacion.recurso?.tipo || "N/A",
         asignacion.tareaAsignada || "Sin tarea",
         asignacion.ubicacionAsignacion || "N/A",
+        new Date(asignacion.fechaHoraAsignacion).toLocaleString(),
+        asignacion.fechaHoraDesmovilizacion ? new Date(asignacion.fechaHoraDesmovilizacion).toLocaleString() : "Activo",
       ]);
 
       autoTable(doc, {
         startY: y,
-        head: [["Recurso", "Tipo", "Tarea", "Ubicación"]],
+        head: [["Recurso", "Tipo", "Tarea", "Ubicación", "Asignado", "Desmovilizado"]],
         body: tableData,
         theme: "striped",
         headStyles: { fillColor: ROJO_INSTITUCIONAL, textColor: 255, fontSize: 8 },
-        bodyStyles: { fontSize: 8 },
+        bodyStyles: { fontSize: 7 },
         margin: { left: 14, right: 14 },
+        styles: { cellPadding: 1.5 },
       });
       y = (doc as any).lastAutoTable.finalY + 8;
     }
 
-    // --- Víctimas (tabla) ---
+    // ============================================================
+    // SECCIÓN 5: SCI-207 - REGISTRO DE VÍCTIMAS
+    // ============================================================
     if (incidente.victimas && incidente.victimas.length > 0) {
-      doc.setFontSize(14);
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
-      doc.text("Víctimas registradas:", 14, y);
+      doc.text("5. SCI-207 - Registro de Víctimas", 14, y);
       y += 6;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
 
       const tableData = incidente.victimas.map((victima: any) => {
         const triage = victima.historialTriage?.[0]?.clasificacion || "Sin clasificar";
-        const observaciones = victima.notasAdicionales || "N/A";
         return [
           victima.nombrePaciente || "No identificado",
           victima.sexo || "N/A",
@@ -126,7 +250,7 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
           triage,
           victima.estadoAtencion || "N/A",
           victima.centroHospitalario || "N/A",
-          observaciones,
+          victima.notasAdicionales || "N/A",
         ];
       });
 
@@ -141,43 +265,78 @@ export default function BotonGenerarPDF({ incidente }: BotonGenerarPDFProps) {
         styles: { cellPadding: 1.5 },
         columnStyles: {
           0: { cellWidth: 30 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 15 },
-          3: { cellWidth: 25 },
-          4: { cellWidth: 25 },
+          1: { cellWidth: 18 },
+          2: { cellWidth: 14 },
+          3: { cellWidth: 24 },
+          4: { cellWidth: 24 },
           5: { cellWidth: 30 },
           6: { cellWidth: 40 },
         },
       });
       y = (doc as any).lastAutoTable.finalY + 8;
-    }
 
-    // --- Resumen de estadísticas (opcional) ---
-    if (incidente.victimas && incidente.victimas.length > 0) {
+      // Resumen de triage
       const triageCount: { [key: string]: number } = {};
       incidente.victimas.forEach((v: any) => {
         const triage = v.historialTriage?.[0]?.clasificacion || "Sin clasificar";
         triageCount[triage] = (triageCount[triage] || 0) + 1;
       });
 
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setTextColor(...ROJO_INSTITUCIONAL);
       doc.text("Resumen por clasificación de triage:", 14, y);
-      y += 6;
+      y += 5;
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
       for (const [key, value] of Object.entries(triageCount)) {
         doc.text(`- ${key}: ${value}`, 16, y);
-        y += 6;
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
       }
     }
 
-    // --- Pie de página ---
+    // ============================================================
+    // SECCIÓN 6: PERIODOS OPERACIONALES
+    // ============================================================
+    if (incidente.periodosOperacionales && incidente.periodosOperacionales.length > 0) {
+      if (y > 200) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(13);
+      doc.setTextColor(...ROJO_INSTITUCIONAL);
+      doc.text("6. Periodos Operacionales", 14, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      const periodoData = incidente.periodosOperacionales.map((p: any) => [
+        `Periodo ${p.numeroPeriodo}`,
+        new Date(p.fechaHoraInicio).toLocaleString(),
+        new Date(p.fechaHoraFin).toLocaleString(),
+        p.observaciones || "—",
+      ]);
+
+      autoTable(doc, {
+        startY: y,
+        head: [["Periodo", "Inicio", "Fin", "Observaciones"]],
+        body: periodoData,
+        theme: "striped",
+        headStyles: { fillColor: ROJO_INSTITUCIONAL, textColor: 255, fontSize: 8 },
+        bodyStyles: { fontSize: 8 },
+        margin: { left: 14, right: 14 },
+      });
+      y = (doc as any).lastAutoTable.finalY + 8;
+    }
+
+    // Pie de página
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(`Generado desde GECI-VA el ${new Date().toLocaleString()}`, 14, 285);
 
-    // Guardar PDF
     doc.save(`incidente_${incidente.folio}.pdf`);
   };
 

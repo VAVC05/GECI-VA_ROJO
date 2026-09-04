@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -12,9 +11,9 @@ const updateVictimaSchema = z.object({
   lugarRegistro: z.string().optional(),
   notasAdicionales: z.string().optional(),
   estadoAtencion: z.enum(['EN_ESPERA', 'ATENDIDO_EN_SITIO', 'TRASLADADO']).optional(),
+  centroHospitalario: z.string().optional(), // ← Agregado
 });
 
-// GET /api/victimas/[id] - Detalle de una víctima
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -65,7 +64,6 @@ export async function GET(
   }
 }
 
-// PUT /api/victimas/[id] - Editar una víctima
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -125,10 +123,9 @@ export async function PUT(
       { error: 'Error al actualizar víctima' },
       { status: 500 }
     );
-	
-	
+  }
+}
 
-// DELETE /api/victimas/[id]
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -184,7 +181,5 @@ export async function DELETE(
       { error: 'Error al eliminar víctima' },
       { status: 500 }
     );
-  }
-}
   }
 }

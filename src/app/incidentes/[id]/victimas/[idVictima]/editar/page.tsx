@@ -1,80 +1,131 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function NuevaVictimaPage() {
+interface Victima {
+  idVictima: number;
+  nombrePaciente: string | null;
+  sexo: string | null;
+  edad: number | null;
+  lugarRegistro: string;
+  estadoAtencion: "EN_ESPERA" | "ATENDIDO_EN_SITIO" | "TRASLADADO";
+  centroHospitalario: string | null;
+  notasAdicionales: string | null;
+  idIncidente: number;
+}
+
+export default function EditarVictimaPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const idVictima = params.idVictima as string;
 
-  const [cargando, setCargando] = useState(false);
+  const [victima, setVictima] = useState<Victima | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Estado del formulario
+  const [nombrePaciente, setNombrePaciente] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [edad, setEdad] = useState<number | "">("");
+  const [lugarRegistro, setLugarRegistro] = useState("");
+  const [centroHospitalario, setCentroHospitalario] = useState("");
+  const [notasAdicionales, setNotasAdicionales] = useState("");
+
+  // Cargar datos de la víctima
+  useEffect(() => {
+    if (idVictima) {
+      fetch(`/api/victimas/${idVictima}`)
+        .then(async (res) => {
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "Error al cargar víctima");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setVictima(data);
+          setNombrePaciente(data.nombrePaciente || "");
+          setSexo(data.sexo || "");
+          setEdad(data.edad ?? "");
+          setLugarRegistro(data.lugarRegistro || "");
+          setCentroHospitalario(data.centroHospitalario || "");
+          setNotasAdicionales(data.notasAdicionales || "");
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [idVictima]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setCargando(true);
-
-    const formData = new FormData(e.currentTarget);
-    const nombrePaciente = (formData.get("nombrePaciente") as string)?.trim() || "";
-    const sexo = formData.get("sexo") as string;
-    const edad = parseInt(formData.get("edad") as string) || undefined;
-    const lugarRegistro = formData.get("lugarRegistro") as string;
-    const notasAdicionales = (formData.get("notasAdicionales") as string)?.trim() || undefined;
-
-    // ✅ Validaciones críticas
-    if (!nombrePaciente) {
-      setError("El nombre del paciente es obligatorio");
-      setCargando(false);
-      return;
-    }
-    if (/^\d+$/.test(nombrePaciente)) {
-      setError("El nombre del paciente no puede ser solo números");
-      setCargando(false);
-      return;
-    }
-    if (nombrePaciente.length < 2) {
-      setError("El nombre del paciente debe tener al menos 2 caracteres");
-      setCargando(false);
-      return;
-    }
+    setSuccess("");
+    setSaving(true);
 
     const data = {
-      idIncidente: parseInt(id),
-      nombrePaciente,
-      sexo,
-      edad,
-      lugarRegistro,
-      notasAdicionales,
+      nombrePaciente: nombrePaciente.trim() || undefined,
+      sexo: sexo || undefined,
+      edad: edad === "" ? undefined : Number(edad),
+      lugarRegistro: lugarRegistro,
+      centroHospitalario: centroHospitalario.trim() || undefined,
+      notasAdicionales: notasAdicionales.trim() || undefined,
     };
 
     try {
-      const res = await fetch("/api/victimas", {
-        method: "POST",
+      const res = await fetch(`/api/victimas/${idVictima}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (res.ok) {
-        router.push(`/incidentes/${id}`);
+        setSuccess("Víctima actualizada correctamente");
+        setTimeout(() => {
+          router.push(`/incidentes/${id}`);
+        }, 1500);
       } else {
         const errorData = await res.json();
-        setError(errorData.error || "Error al registrar la víctima");
+        setError(errorData.error || "Error al actualizar víctima");
       }
     } catch (err) {
       setError("Error de red. Inténtalo de nuevo.");
     } finally {
-      setCargando(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
+        <p>Cargando víctima...</p>
+      </div>
+    );
+  }
+
+  if (!victima) {
+    return (
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
+        <p>Víctima no encontrada</p>
+        <Link href={`/incidentes/${id}`} className="text-rojo hover:underline mt-4 block font-medium">
+          Volver al detalle
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="mx-auto max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-rojo">Registrar nueva víctima</h1>
+          <h1 className="text-2xl font-bold text-rojo">Editar víctima</h1>
           <Link href={`/incidentes/${id}`} className="text-rojo hover:underline font-medium">
             ← Volver al detalle
           </Link>
@@ -86,6 +137,12 @@ export default function NuevaVictimaPage() {
           </div>
         )}
 
+        {success && (
+          <div className="mb-4 rounded bg-green-50 border border-green-200 p-3 text-sm text-green-700">
+            {success}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div>
             <label htmlFor="nombrePaciente" className="block text-sm font-medium text-gray-700">
@@ -94,12 +151,12 @@ export default function NuevaVictimaPage() {
             <input
               type="text"
               id="nombrePaciente"
-              name="nombrePaciente"
+              value={nombrePaciente}
+              onChange={(e) => setNombrePaciente(e.target.value)}
               required
               className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Juan Pérez"
             />
-            <p className="mt-1 text-xs text-gray-500">No puede estar vacío ni ser solo números</p>
           </div>
 
           <div>
@@ -108,7 +165,8 @@ export default function NuevaVictimaPage() {
             </label>
             <select
               id="sexo"
-              name="sexo"
+              value={sexo}
+              onChange={(e) => setSexo(e.target.value)}
               required
               className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
@@ -126,7 +184,8 @@ export default function NuevaVictimaPage() {
             <input
               type="number"
               id="edad"
-              name="edad"
+              value={edad}
+              onChange={(e) => setEdad(e.target.value === "" ? "" : Number(e.target.value))}
               min="0"
               className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: 35"
@@ -139,7 +198,8 @@ export default function NuevaVictimaPage() {
             </label>
             <select
               id="lugarRegistro"
-              name="lugarRegistro"
+              value={lugarRegistro}
+              onChange={(e) => setLugarRegistro(e.target.value)}
               required
               className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
@@ -151,12 +211,30 @@ export default function NuevaVictimaPage() {
           </div>
 
           <div>
+            <label htmlFor="centroHospitalario" className="block text-sm font-medium text-gray-700">
+              Centro hospitalario (traslado)
+            </label>
+            <input
+              type="text"
+              id="centroHospitalario"
+              value={centroHospitalario}
+              onChange={(e) => setCentroHospitalario(e.target.value)}
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              placeholder="Ej: Hospital General de Metepec"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Si la víctima fue trasladada, puedes actualizar el hospital aquí.
+            </p>
+          </div>
+
+          <div>
             <label htmlFor="notasAdicionales" className="block text-sm font-medium text-gray-700">
               Notas adicionales
             </label>
             <textarea
               id="notasAdicionales"
-              name="notasAdicionales"
+              value={notasAdicionales}
+              onChange={(e) => setNotasAdicionales(e.target.value)}
               rows={3}
               className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Información adicional sobre la víctima..."
@@ -166,14 +244,14 @@ export default function NuevaVictimaPage() {
           <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              disabled={cargando}
+              disabled={saving}
               className={`rounded px-6 py-2 text-sm font-medium text-white ${
-                cargando
+                saving
                   ? "cursor-not-allowed bg-gray-400"
                   : "bg-carbon hover:bg-carbon-oscuro"
               }`}
             >
-              {cargando ? "Guardando..." : "Registrar víctima"}
+              {saving ? "Guardando..." : "Actualizar víctima"}
             </button>
             <Link
               href={`/incidentes/${id}`}
