@@ -5,6 +5,53 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import BotonGenerarPDF from "@/components/BotonGenerarPDF";
 
+// Interfaz para la estructura de una víctima
+interface Victima {
+  idVictima: number;
+  nombrePaciente: string | null;
+  sexo: string | null;
+  edad: number | null;
+  lugarRegistro: string;
+  estadoAtencion: string;
+  centroHospitalario: string | null;
+  notasAdicionales: string | null;
+  historialTriage?: { clasificacion: string; fechaHoraClasificacion: string }[];
+}
+
+// Interfaz para un recurso asignado
+interface AsignacionRecurso {
+  idAsignacion: number;
+  recurso: { nombre: string; tipo: string };
+  tareaAsignada: string | null;
+  ubicacionAsignacion: string | null;
+  fechaHoraAsignacion: string;
+  fechaHoraDesmovilizacion: string | null;
+}
+
+// Interfaz para un periodo operacional
+interface PeriodoOperacional {
+  idPeriodo: number;
+  numeroPeriodo: number;
+  fechaHoraInicio: string;
+  fechaHoraFin: string;
+  observaciones: string | null;
+}
+
+// Interfaz para un plan de acción
+interface PlanAccion {
+  idPai: number;
+  objetivosOperacionales: string;
+  estrategias: string | null;
+  tacticas: string | null;
+  recursosEnLugar: string | null;
+  recursosPorSolicitar: string | null;
+  mensajeSeguridad: string | null;
+  nombreJefePlanificacion: string | null;
+  fechaHoraPreparacion: string;
+  periodo?: { numeroPeriodo: number };
+}
+
+// Interfaz principal del incidente
 interface Incidente {
   idIncidente: number;
   folio: string;
@@ -28,13 +75,13 @@ interface Incidente {
   rutaEgreso: string | null;
   mensajeSeguridad: string | null;
   canalesComunicacion: string | null;
-  organizacionSCI?: any[];
-  planComunicaciones?: any;
-  planMedico?: any;
-  victimas?: any[];
-  asignacionesRecurso?: any[];
-  periodosOperacionales?: any[];
-  planesAccion?: any[];
+  organizacionSCI?: { rol: string; nombre: string }[];
+  planComunicaciones?: { sistema: string; canales: string; equipos: string };
+  planMedico?: { instalaciones: string; hospitales: string; personal: string };
+  victimas?: Victima[];
+  asignacionesRecurso?: AsignacionRecurso[];
+  periodosOperacionales?: PeriodoOperacional[];
+  planesAccion?: PlanAccion[];
 }
 
 export default function DetalleIncidentePage() {
@@ -201,13 +248,13 @@ export default function DetalleIncidentePage() {
             </div>
           </div>
 
-          {/* Organización del SCI (organigrama con formato árbol) */}
+          {/* Organización del SCI */}
           {incidente.organizacionSCI && incidente.organizacionSCI.length > 0 && (
             <div className="mt-6 border-t border-gray-200 pt-4">
               <h3 className="text-sm font-medium text-gray-500 mb-2">Organización de la Emergencia (SCI)</h3>
               <div className="bg-gray-50 p-3 rounded border border-gray-200">
                 <div className="font-mono text-sm text-gray-800">
-                  {incidente.organizacionSCI.map((item: any, idx: number) => (
+                  {incidente.organizacionSCI.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <span className="text-gray-400">{idx === 0 ? "└──" : "├──"}</span>
                       <span className="font-medium">{item.rol}:</span>
@@ -220,7 +267,7 @@ export default function DetalleIncidentePage() {
           )}
 
           {/* SCI-205 Plan de Comunicaciones */}
-          {incidente.planComunicaciones && (incidente.planComunicaciones.sistema || incidente.planComunicaciones.canales || incidente.planComunicaciones.equipos) && (
+          {incidente.planComunicaciones && (
             <div className="mt-6 border-t border-gray-200 pt-4">
               <h3 className="text-sm font-medium text-gray-500 mb-2">SCI-205 - Plan de Comunicaciones</h3>
               <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3 bg-gray-50 p-3 rounded border border-gray-200">
@@ -238,7 +285,7 @@ export default function DetalleIncidentePage() {
           )}
 
           {/* SCI-206 Plan Médico */}
-          {incidente.planMedico && (incidente.planMedico.instalaciones || incidente.planMedico.hospitales || incidente.planMedico.personal) && (
+          {incidente.planMedico && (
             <div className="mt-6 border-t border-gray-200 pt-4">
               <h3 className="text-sm font-medium text-gray-500 mb-2">SCI-206 - Plan Médico</h3>
               <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3 bg-gray-50 p-3 rounded border border-gray-200">
@@ -262,7 +309,7 @@ export default function DetalleIncidentePage() {
             </div>
           )}
 
-          {/* Periodos operacionales */}
+          {/* Periodos Operacionales */}
           <div className="mt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">Periodos Operacionales</h2>
@@ -278,7 +325,7 @@ export default function DetalleIncidentePage() {
 
             {incidente.periodosOperacionales && incidente.periodosOperacionales.length > 0 ? (
               <div className="mt-3 space-y-2">
-                {incidente.periodosOperacionales.map((periodo: any) => (
+                {incidente.periodosOperacionales.map((periodo) => (
                   <div
                     key={periodo.idPeriodo}
                     className="rounded border border-gray-200 bg-gray-50 p-3 flex items-center justify-between"
@@ -351,7 +398,7 @@ export default function DetalleIncidentePage() {
 
             {incidente.planesAccion && incidente.planesAccion.length > 0 ? (
               <div className="mt-3 space-y-3">
-                {incidente.planesAccion.map((plan: any) => (
+                {incidente.planesAccion.map((plan) => (
                   <div
                     key={plan.idPai}
                     className="rounded border border-gray-200 bg-gray-50 p-4"
@@ -492,7 +539,7 @@ export default function DetalleIncidentePage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {incidente.victimas.map((victima: any) => {
+                    {incidente.victimas.map((victima) => {
                       const ultimoTriage = victima.historialTriage?.[0]?.clasificacion || "Sin clasificar";
                       return (
                         <tr key={victima.idVictima} className="hover:bg-gray-50">

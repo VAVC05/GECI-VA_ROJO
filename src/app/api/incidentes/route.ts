@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 
-// Esquema de validación (usando camelCase como en tu modelo)
+// creación de incidentes.
 const createIncidentSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   tipo: z.string().min(1, 'El tipo es obligatorio'),
@@ -21,7 +21,7 @@ const createIncidentSchema = z.object({
   canalesComunicacion: z.string().optional(),
 });
 
-// GET /api/incidentes - Listar incidentes
+// Lista incidentes 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -35,10 +35,12 @@ export async function GET(request: NextRequest) {
     const estado = searchParams.get('estado');
     const tipo = searchParams.get('tipo');
 
+    // Construir filtros dinámicamente.
     const where: any = {};
     if (estado) where.estado = estado;
     if (tipo) where.tipo = tipo;
 
+    // Obtener incidentes y conteo total 
     const [incidentes, total] = await Promise.all([
       prisma.incidente.findMany({
         where,
@@ -54,14 +56,22 @@ export async function GET(request: NextRequest) {
       prisma.incidente.count({ where }),
     ]);
 
-    return NextResponse.json({ incidentes, total, page });
+    return NextResponse.json({
+      incidentes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error('Error en GET /api/incidentes:', error);
-    return NextResponse.json({ error: 'Error al obtener incidentes' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error al obtener incidentes' },
+      { status: 500 }
+    );
   }
 }
 
-// POST /api/incidentes - Crear incidente
+// Crea un nuevo incidente.
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -69,7 +79,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Verificar rol
+    // Verificar que el rol tenga permisos para crear incidentes.
     const rolesPermitidos = ['Administrador', 'Tecnico Operativo', 'Jefe Bomberos', 'Jefe Paramedicos'];
     if (!rolesPermitidos.includes(session.user?.rol || '')) {
       return NextResponse.json(
@@ -80,9 +90,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const result = createIncidentSchema.safeParse(body);
+
     if (!result.success) {
       return NextResponse.json(
-			{ error: 'Datos inválidos', details: result.error.issues },
+        { error: 'Datos inválidos', details: result.error.issues },
         { status: 400 }
       );
     }
@@ -103,21 +114,25 @@ export async function POST(request: NextRequest) {
       canalesComunicacion,
     } = result.data;
 
-    // Generar folio
+    // Generar folio con formato GECI-YYYY-XXXXX (se reinicia cada año).
     const hoy = new Date();
-    const fechaStr = hoy.toISOString().slice(0, 10).replace(/-/g, '');
+    const anio = hoy.getFullYear();
+    
+    // Buscar el último incidente del año actual para obtener el consecutivo.
     const ultimo = await prisma.incidente.findFirst({
-      where: { folio: { startsWith: `GECI-${fechaStr}` } },
+      where: { folio: { startsWith: `GECI-${anio}` } },
       orderBy: { folio: 'desc' },
     });
+
     let consecutivo = 1;
     if (ultimo) {
       const partes = ultimo.folio.split('-');
       consecutivo = parseInt(partes[2]) + 1;
     }
-    const folio = `GECI-${fechaStr}-${String(consecutivo).padStart(4, '0')}`;
 
-    // Crear incidente usando el campo directo idUsuarioRegistro
+    const folio = `GECI-${anio}-${String(consecutivo).padStart(5, '0')}`;
+
+    // Guardar el incidente en la base de datos.
     const nuevoIncidente = await prisma.incidente.create({
       data: {
         folio,
@@ -135,13 +150,16 @@ export async function POST(request: NextRequest) {
         mensajeSeguridad,
         canalesComunicacion,
         estado: 'ACTIVO',
-        idUsuarioRegistro: session.user.idUsuario, // ← ¡directo!
+        idUsuarioRegistro: session.user.idUsuario,
       },
     });
 
     return NextResponse.json(nuevoIncidente, { status: 201 });
   } catch (error) {
     console.error('Error en POST /api/incidentes:', error);
-    return NextResponse.json({ error: 'Error al crear incidente' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error al crear incidente' },
+      { status: 500 }
+    );
   }
 }

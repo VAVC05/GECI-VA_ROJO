@@ -3,14 +3,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-// Minutos de inactividad (RNF-01)
+// inactividad en minutos antes de que la sesión expire 
 const MINUTOS_INACTIVIDAD = Number(process.env.MINUTOS_INACTIVIDAD ?? 30);
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: MINUTOS_INACTIVIDAD * 60,
-    updateAge: 0, // renueva el token en cada petición
+    updateAge: 0, //  evita expiración por inactividad.
   },
   pages: {
     signIn: "/login",
@@ -27,15 +27,18 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        // Busca el usuario por correo incluyendo su rol.
         const usuario = await prisma.usuario.findUnique({
           where: { correo: credentials.correo },
           include: { rol: true },
         });
 
+        // Si el usuario no existe o está inactivo, deniega el acceso.
         if (!usuario || !usuario.estado) {
           return null;
         }
 
+        // Compara la contraseña ingresada con el hash almacenado.
         const contrasenaValida = await bcrypt.compare(
           credentials.contrasena,
           usuario.contrasenaHash
@@ -45,17 +48,16 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Actualizar último acceso (RNF-10)
+        // Registra la fecha del último acceso 
         await prisma.usuario.update({
           where: { idUsuario: usuario.idUsuario },
           data: { fechaUltimoAcceso: new Date() },
         });
 
-        // Devolvemos el usuario incluyendo idUsuario y rol.
-        // NextAuth espera 'id' como string, pero nosotros guardamos también el número.
+        // Devuelve el objeto de usuario que NextAuth almacenará en el JWT.
         return {
           id: String(usuario.idUsuario),
-          idUsuario: usuario.idUsuario, // ← guardamos el número para uso interno
+          idUsuario: usuario.idUsuario,
           name: usuario.nombreCompleto,
           email: usuario.correo,
           rol: usuario.rol.nombre,
@@ -64,19 +66,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // jwt: se ejecuta al crear/actualizar el token JWT
+    // Se ejecuta al crear o actualizar el JWT. Copia los datos del usuario al token.
     async jwt({ token, user }) {
       if (user) {
-        // Guardamos idUsuario y rol en el token
         token.idUsuario = (user as any).idUsuario;
         token.rol = (user as any).rol;
       }
       return token;
     },
-    // session: se ejecuta al obtener la sesión (cada vez que se llama a getServerSession)
+    // Se ejecuta al obtener la sesión. Transfiere los datos del token a la sesión.
     async session({ session, token }) {
       if (session.user) {
-        // Pasamos idUsuario y rol del token a la sesión
         (session.user as any).idUsuario = token.idUsuario;
         (session.user as any).rol = token.rol;
       }
