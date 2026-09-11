@@ -10,7 +10,7 @@ const updateUserSchema = z.object({
   estado: z.boolean().optional(),
 });
 
-// GET /api/usuarios/[id] - Obtener detalle de un usuario
+//  detalle de un usuario
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -49,7 +49,7 @@ export async function GET(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // ✅ CORREGIDO: usar idUsuario en lugar de id
+    // usa el idUsuario para verificar si tiene permisos
     if (session.user?.rol !== 'Administrador' && session.user?.idUsuario !== idNumero) {
       return NextResponse.json(
         { error: 'No tienes permisos para ver este usuario' },
@@ -67,7 +67,7 @@ export async function GET(
   }
 }
 
-// PUT /api/usuarios/[id] - Actualizar usuario (solo Administrador)
+//  Actualizar usuario solo Administrador
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -149,7 +149,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/usuarios/[id] - Eliminar usuario (solo Administrador)
+// Eliminar usuario solo Administrador
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -173,7 +173,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    //  CORREGIDO: usar idUsuario en lugar de id
+    //  usa idUsuario para eliminar usuario
     if (idNumero === session.user.idUsuario) {
       return NextResponse.json(
         { error: 'No puedes eliminar tu propia cuenta' },

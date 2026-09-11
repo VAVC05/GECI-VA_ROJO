@@ -24,7 +24,7 @@ export default function NuevaVictimaPage() {
     const lugarRegistro = formData.get("lugarRegistro") as string;
     const notasAdicionales = (formData.get("notasAdicionales") as string)?.trim() || undefined;
 
-    // ✅ Validaciones críticas
+    // Validaciones críticas
     if (!nombrePaciente) {
       setError("El nombre del paciente es obligatorio");
       setCargando(false);

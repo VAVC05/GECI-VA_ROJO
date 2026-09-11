@@ -599,7 +599,7 @@ export default function DetalleIncidentePage() {
                                 }}
                                 className="rounded bg-purple-600 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-purple-500 whitespace-nowrap"
                               >
-                                {victima.historialTriage?.length > 0 ? "Reclasificar" : "Clasificar"}
+                              {(victima.historialTriage?.length ?? 0) > 0 ? "Reclasificar" : "Clasificar"}
                               </button>
 
                               {victima.estadoAtencion !== "TRASLADADO" && (

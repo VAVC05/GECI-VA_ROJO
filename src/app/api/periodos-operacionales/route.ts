@@ -12,7 +12,7 @@ const createPeriodoSchema = z.object({
   observaciones: z.string().optional(),
 });
 
-// GET /api/periodos-operacionales
+// obtene los periodos operacionales
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/periodos-operacionales
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

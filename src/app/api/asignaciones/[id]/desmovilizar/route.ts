@@ -8,7 +8,7 @@ const desmovilizarSchema = z.object({
   observaciones: z.string().optional(),
 });
 
-// PATCH /api/asignaciones/[id]/desmovilizar
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

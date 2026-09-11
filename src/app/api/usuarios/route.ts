@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 
-// Esquema de validación para crear usuario (solo Administrador)
+//  crear usuario solo Administrador
 const createUserSchema = z.object({
   nombreCompleto: z.string().min(3, 'El nombre completo es obligatorio'),
   correo: z.string().email('Correo electrónico inválido'),
@@ -13,7 +13,7 @@ const createUserSchema = z.object({
   idRol: z.number().int().min(1, 'El rol es obligatorio'),
 });
 
-// GET /api/usuarios - Listar todos los usuarios (solo Administrador)
+// Lista a todos los usuarios 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/usuarios - Crear un nuevo usuario (solo Administrador)
+// Crear un nuevo usuario solo Administrador
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     const { nombreCompleto, correo, contrasena, idRol } = result.data;
 
-    // Verificar si el correo ya existe
+    // Verifica si el correo ya existe
     const usuarioExistente = await prisma.usuario.findUnique({
       where: { correo },
     });

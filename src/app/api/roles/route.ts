@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-// GET /api/roles - Listar todos los roles
+// Lista todos los roles
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Solo Administrador puede ver roles (para crear usuarios)
+    //  Administrador  ve roles 
     if (session.user?.rol !== 'Administrador') {
       return NextResponse.json(
         { error: 'No tienes permisos' },

@@ -18,8 +18,8 @@ const updateIncidentSchema = z.object({
   mensajeSeguridad: z.string().optional(),
   canalesComunicacion: z.string().optional(),
   organizacionSCI: z.any().optional(),
-  planComunicaciones: z.any().optional(), // Nuevo
-  planMedico: z.any().optional(),         // Nuevo
+  planComunicaciones: z.any().optional(), 
+  planMedico: z.any().optional(),         
 });
 
 export async function GET(

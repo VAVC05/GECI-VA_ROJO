@@ -10,7 +10,7 @@ const passwordSchema = z.object({
   contrasenaNueva: z.string().min(8, 'La nueva contraseña debe tener al menos 8 caracteres'),
 });
 
-// PATCH /api/usuarios/[id]/password - Cambiar contraseña (el propio usuario)
+//  Cambiar contraseña por el propio usuario
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -27,7 +27,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    // ✅ CORREGIDO: usar idUsuario en lugar de id
+    // usa idUsuario para cambiar contraseña
     if (session.user?.idUsuario !== idNumero && session.user?.rol !== 'Administrador') {
       return NextResponse.json(
         { error: 'No tienes permisos para cambiar esta contraseña' },
@@ -55,7 +55,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // Si no es Administrador, verificar la contraseña actual
+    //verificar la contraseña actual
     if (session.user?.rol !== 'Administrador') {
       const contrasenaValida = await bcrypt.compare(contrasenaActual, usuario.contrasenaHash);
       if (!contrasenaValida) {

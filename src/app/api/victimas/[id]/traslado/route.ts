@@ -9,7 +9,7 @@ const trasladoSchema = z.object({
   observaciones: z.string().optional(),
 });
 
-// PATCH /api/victimas/[id]/traslado - Registrar traslado
+// Registrar traslado
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

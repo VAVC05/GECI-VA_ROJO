@@ -8,7 +8,7 @@ const estadoSchema = z.object({
   estado: z.boolean(),
 });
 
-// PATCH /api/usuarios/[id]/estado - Activar o desactivar usuario
+// Activa o desactiva usuario
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -51,7 +51,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    //  CORREGIDO: usar idUsuario en lugar de id
+    //  uso de id para cambiar estado
     if (idNumero === session.user.idUsuario && result.data.estado === false) {
       return NextResponse.json(
         { error: 'No puedes desactivar tu propia cuenta' },

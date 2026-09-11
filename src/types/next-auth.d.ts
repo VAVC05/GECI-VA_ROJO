@@ -7,19 +7,19 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       rol: string;
-      idUsuario: number; // ← agregamos idUsuario
+      idUsuario: number; // agregamos idUsuario
     };
   }
 
   interface User {
     rol: string;
-    idUsuario: number; // ← también en User
+    idUsuario: number; 
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     rol?: string;
-    idUsuario?: number; // ← y en JWT
+    idUsuario?: number; 
   }
 }

@@ -14,7 +14,7 @@ const updateRecursoSchema = z.object({
   estado: z.enum(['DISPONIBLE', 'ASIGNADO', 'NO_DISPONIBLE']).optional(),
 });
 
-// GET /api/recursos/[id] - Ver detalle de un recurso
+//  detalle de un recurso
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,7 +62,7 @@ export async function GET(
   }
 }
 
-// PUT /api/recursos/[id] - Editar recurso
+//  Editar recurso
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -73,7 +73,7 @@ export async function PUT(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Solo Administrador puede editar recursos
+    //  Administrador  edita recursos
     if (session.user?.rol !== 'Administrador') {
       return NextResponse.json(
         { error: 'No tienes permisos para editar recursos' },

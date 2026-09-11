@@ -11,7 +11,7 @@ const updateVictimaSchema = z.object({
   lugarRegistro: z.string().optional(),
   notasAdicionales: z.string().optional(),
   estadoAtencion: z.enum(['EN_ESPERA', 'ATENDIDO_EN_SITIO', 'TRASLADADO']).optional(),
-  centroHospitalario: z.string().optional(), // ← Agregado
+  centroHospitalario: z.string().optional(), 
 });
 
 export async function GET(

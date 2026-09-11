@@ -9,7 +9,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Módulo 1: Control de Acceso y Gestión de Usuarios
+//  Control de Acceso y Gestión de Usuarios
 
 model Rol {
   idRol       Int    @id @default(autoincrement()) @map("id_rol")
@@ -44,7 +44,7 @@ model Usuario {
   @@map("usuarios")
 }
 
-// Módulo 2: Registro de Incidentes
+//  Registro de Incidentes
 
 enum EstadoIncidente {
   ACTIVO
@@ -106,7 +106,7 @@ model PeriodoOperacional {
   @@map("periodos_operacionales")
 }
 
-// Módulo 3: Gestión de Recursos y Personal
+// Gestión de Recursos y Personal
 
 enum EstadoRecurso {
   DISPONIBLE
@@ -147,7 +147,7 @@ model AsignacionRecurso {
   @@map("asignaciones_recurso")
 }
 
-// Módulo 4: Plan de Acción del Incidente
+// Plan de Acción del Incidente
 
 model PlanAccion {
   idPai                    Int      @id @default(autoincrement()) @map("id_pai")
@@ -170,7 +170,7 @@ model PlanAccion {
   @@map("planes_accion")
 }
 
-// Módulo 5: Registro de Víctimas
+// Registro de Víctimas
 
 enum EstadoVictima {
   EN_ESPERA
@@ -220,7 +220,7 @@ model HistorialTriage {
   @@map("historial_triage")
 }
 
-// Módulo 6: Consultas y Reportes (formularios SCI + auditoría)
+// Consultas y Reportes 
 
 enum TipoFormularioSci {
   SCI_201

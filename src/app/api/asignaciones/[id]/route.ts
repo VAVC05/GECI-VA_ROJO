@@ -8,7 +8,7 @@ const desmovilizarSchema = z.object({
   observaciones: z.string().optional(),
 });
 
-// PATCH /api/asignaciones/[id]/desmovilizar - Desmovilizar un recurso
+// Desmovilizar un recurso
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -45,7 +45,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Asignación no encontrada' }, { status: 404 });
     }
 
-    // Verificar que no esté ya desmovilizada
+    // Verificar el estado del activo
     if (asignacion.fechaHoraDesmovilizacion !== null) {
       return NextResponse.json(
         { error: 'Este recurso ya fue desmovilizado' },
@@ -53,7 +53,7 @@ export async function PATCH(
       );
     }
 
-    // Desmovilizar (actualizar asignación)
+    // actualizar asignación
     const asignacionDesmovilizada = await prisma.asignacionRecurso.update({
       where: { idAsignacion: idNumero },
       data: {

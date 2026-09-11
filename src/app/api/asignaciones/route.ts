@@ -11,7 +11,7 @@ const asignarRecursoSchema = z.object({
   ubicacionAsignacion: z.string().optional(),
 });
 
-// POST /api/asignaciones - Asignar un recurso a un incidente
+// Asignar  recursos 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Actualizar el estado del recurso a ASIGNADO
+    // Actualizar el estado del recurso 
     await prisma.recurso.update({
       where: { idRecurso },
       data: { estado: 'ASIGNADO' },

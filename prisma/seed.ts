@@ -1,6 +1,4 @@
 // Script de datos de prueba (seed) para GECI-VA.
-//
-// Esto NO son datos reales de la Coordinación, son solo para poder probar el sistema mientras se desarrolla
 
 
 import { PrismaClient } from "@prisma/client";
@@ -8,7 +6,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// Creación de los seis roles 
+// Creación de  roles 
 
 const ROLES = [
   {
@@ -39,8 +37,7 @@ const ROLES = [
   },
 ];
 
-// Contraseña temporal para TODOS los usuarios de prueba. Cumple la regla de HU-007 (mínimo 8 caracteres, una mayúscula, un número)  Esto es solo para desarrollo: en producción cada quien la cambia
-// en su primer inicio de sesión.
+
 const PASSWORD_PRUEBA = "Geciva2026!";
 
 async function main() {

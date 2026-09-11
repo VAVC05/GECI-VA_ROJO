@@ -8,7 +8,7 @@ const triageSchema = z.object({
   clasificacion: z.enum(['ROJO', 'AMARILLO', 'VERDE', 'NEGRO']),
 });
 
-// PATCH /api/victimas/[id]/triage - Clasificar por triage
+// Clasificar triage
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -19,7 +19,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Solo Jefe Paramédicos y Administrador pueden clasificar
+    // clasificion por Paramédicos y Administrador 
     const rolesPermitidos = ['Administrador', 'Jefe Paramedicos'];
     if (!rolesPermitidos.includes(session.user?.rol || '')) {
       return NextResponse.json(
@@ -52,7 +52,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Víctima no encontrada' }, { status: 404 });
     }
 
-    // Registrar la clasificación en el historial
+    // historial de clasificacion
     const nuevaClasificacion = await prisma.historialTriage.create({
       data: {
         idVictima: idNumero,

@@ -14,7 +14,7 @@ const updatePlanSchema = z.object({
   nombreJefePlanificacion: z.string().optional(),
 });
 
-// GET /api/planes-accion/[id]
+// obtener planes de accion
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -57,7 +57,7 @@ export async function GET(
   }
 }
 
-// PUT /api/planes-accion/[id]
+// buscar planes de accion por id
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -134,7 +134,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/planes-accion/[id]
+// borrar planes d eaccion
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

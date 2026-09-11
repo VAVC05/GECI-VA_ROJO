@@ -91,7 +91,7 @@ export default async function IncidentesPage() {
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-sm">
                   <div className="flex gap-2">
-                    {/* Ver */}
+                   
                     <Link
                       href={`/incidentes/${inc.idIncidente}`}
                       className="rounded bg-carbon px-3 py-1 text-xs font-medium text-white hover:bg-carbon-oscuro"
@@ -99,7 +99,7 @@ export default async function IncidentesPage() {
                       Ver
                     </Link>
 
-                    {/* Editar (solo si está activo) */}
+                    {/* Editar  */}
                     {inc.estado === "ACTIVO" && (
                       <Link
                         href={`/incidentes/${inc.idIncidente}/editar`}
@@ -109,7 +109,7 @@ export default async function IncidentesPage() {
                       </Link>
                     )}
 
-                    {/* Cerrar (solo si está activo) */}
+                    {/* Cerrar  */}
                     {inc.estado === "ACTIVO" && (
                       <BotonCerrar incidenteId={inc.idIncidente} nombre={inc.nombre} />
                     )}
