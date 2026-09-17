@@ -116,38 +116,53 @@ export async function POST(request: NextRequest) {
         const anio = hoy.getFullYear();
 
         const ultimo = await prisma.incidente.findFirst({
-            where: { folio: { startsWith: `GECI-${anio}` } },
+            where: { folio: { startsWith: `GECI-${anio}-` } },
             orderBy: { folio: 'desc' },
         });
 
         let consecutivo = 1;
         if (ultimo) {
             const partes = ultimo.folio.split('-');
-            consecutivo = parseInt(partes[2]) + 1;
+            const num = parseInt(partes[2], 10);
+            if (!Number.isNaN(num)) {
+                consecutivo = num + 1;
+            }
         }
 
-        const folio = `GECI-${anio}-${String(consecutivo).padStart(5, '0')}`;
+        let folio = `GECI-${anio}-${String(consecutivo).padStart(5, '0')}`;
+        let nuevoIncidente = null;
+        let intentos = 0;
 
-        const nuevoIncidente = await prisma.incidente.create({
-            data: {
-                folio,
-                nombre,
-                tipo,
-                lugar,
-                fechaHoraInicio: new Date(fechaHoraInicio),
-                amenazasPresentes,
-                areasAfectadas,
-                objetivoInicial,
-                ubicacionPc,
-                ubicacionAe,
-                rutaIngreso,
-                rutaEgreso,
-                mensajeSeguridad,
-                canalesComunicacion,
-                estado: 'ACTIVO',
-                idUsuarioRegistro: session.user.idUsuario,
-            },
-        });
+        while (intentos < 3 && !nuevoIncidente) {
+            try {
+                nuevoIncidente = await prisma.incidente.create({
+                    data: {
+                        folio,
+                        nombre,
+                        tipo,
+                        lugar,
+                        fechaHoraInicio: new Date(fechaHoraInicio),
+                        amenazasPresentes,
+                        areasAfectadas,
+                        objetivoInicial,
+                        ubicacionPc,
+                        ubicacionAe,
+                        rutaIngreso,
+                        rutaEgreso,
+                        mensajeSeguridad,
+                        canalesComunicacion,
+                        estado: 'ACTIVO',
+                        idUsuarioRegistro: session.user.idUsuario,
+                    },
+                });
+            } catch (err) {
+                intentos++;
+                const esColision = err instanceof Error && err.message.includes('Unique constraint');
+                if (!esColision || intentos >= 3) throw err;
+                consecutivo++;
+                folio = `GECI-${anio}-${String(consecutivo).padStart(5, '0')}`;
+            }
+        }
 
         return NextResponse.json(nuevoIncidente, { status: 201 });
     } catch (error) {
