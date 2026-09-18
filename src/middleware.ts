@@ -23,22 +23,40 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const path = req.nextUrl.pathname;
+        // Permitir siempre el acceso a recursos estáticos y rutas públicas,
+        // incluso sin sesión.
+        if (
+          path.startsWith("/logos/") ||
+          path.startsWith("/img/") ||
+          path.startsWith("/_next/") ||
+          path === "/favicon.ico" ||
+          path === "/login" ||
+          path.startsWith("/api/auth/")
+        ) {
+          return true;
+        }
+        return !!token;
+      },
     },
   }
 );
 
-// Configuración de rutas protegidas excluye las públicas 
+// Configuración de rutas protegidas excluye las públicas
 export const config = {
   matcher: [
     /*
      * Coincide con todas las rutas excepto:
      * - api/auth (rutas de autenticación)
+     * - api (resto de endpoints, validan sesión internamente)
      * - _next/static (archivos estáticos)
      * - _next/image (optimización de imágenes)
      * - favicon.ico (favicon)
      * - login (página pública)
+     * - logos (logos institucionales)
+     * - img (imágenes generales)
      */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|login).*)",
+    "/((?!api/auth|api|_next/static|_next/image|favicon.ico|login|logos|img).*)",
   ],
 };
