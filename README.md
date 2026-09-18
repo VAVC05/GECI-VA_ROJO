@@ -11,3 +11,6 @@ Sistema Web de Gestión de Comando de Incidentes GECI-VA para la Coordinación d
 - **Validación:** Zod + React Hook Form
 - **Reportes:** jsPDF, recharts
 
+
+
+
