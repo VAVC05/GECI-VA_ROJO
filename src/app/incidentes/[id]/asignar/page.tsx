@@ -82,7 +82,7 @@ export default function AsignarRecursoPage() {
         throw new Error(errorData.error || "Error al asignar recurso");
       }
 
-      setExito("✅ Recurso asignado correctamente");
+      setExito(" Recurso asignado correctamente");
       // Recargar recursos disponibles
       await cargarDatos();
     } catch (error: any) {

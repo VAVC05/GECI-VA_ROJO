@@ -13,8 +13,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans bg-gris">
-        <HeaderInstitucional />
         <SessionProviderWrapper>
+          <HeaderInstitucional />
           <div className="flex-1">{children}</div>
         </SessionProviderWrapper>
       </body>

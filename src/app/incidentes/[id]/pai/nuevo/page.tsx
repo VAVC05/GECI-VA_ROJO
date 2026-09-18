@@ -105,7 +105,7 @@ export default function NuevoPAIPage() {
 
   if (loadingPeriodos) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 text-white">
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
         <p>Cargando periodos operacionales...</p>
       </div>
     );
@@ -113,22 +113,24 @@ export default function NuevoPAIPage() {
 
   if (periodos.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 text-white">
+      <div className="min-h-screen bg-gris p-6 text-gray-900">
         <div className="mx-auto max-w-2xl">
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Nuevo Plan de Acción</h1>
-            <Link href={`/incidentes/${id}`} className="text-cyan-400 hover:underline">
+            <h1 className="text-2xl font-bold text-rojo">Nuevo Plan de Acción</h1>
+            <Link href={`/incidentes/${id}`} className="text-rojo hover:underline font-medium">
               ← Volver al detalle
             </Link>
           </div>
-          <div className="rounded-lg border border-slate-800 bg-slate-900 p-6 text-center">
-            <p className="text-yellow-400">No hay periodos operacionales registrados para este incidente.</p>
-            <p className="text-sm text-slate-400 mt-2">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 text-center">
+            <p className="font-medium text-yellow-800">
+              No hay periodos operacionales registrados para este incidente.
+            </p>
+            <p className="mt-2 text-sm text-gray-600">
               Debes registrar al menos un periodo operacional antes de crear un Plan de Acción.
             </p>
             <Link
               href={`/incidentes/${id}/periodos/nuevo`}
-              className="mt-4 inline-block rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
+              className="mt-4 inline-block rounded bg-carbon px-4 py-2 text-sm font-medium text-white hover:bg-carbon-oscuro"
             >
               Registrar periodo operacional
             </Link>
@@ -139,30 +141,30 @@ export default function NuevoPAIPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-gris p-6 text-gray-900">
       <div className="mx-auto max-w-3xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Nuevo Plan de Acción del Incidente</h1>
-          <Link href={`/incidentes/${id}`} className="text-cyan-400 hover:underline">
+          <h1 className="text-2xl font-bold text-rojo">Nuevo Plan de Acción del Incidente</h1>
+          <Link href={`/incidentes/${id}`} className="text-rojo hover:underline font-medium">
             ← Volver al detalle
           </Link>
         </div>
 
         {error && (
-          <div className="mb-4 rounded bg-red-900/30 p-3 text-sm text-red-300">
+          <div className="mb-4 rounded bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 rounded bg-green-900/30 p-3 text-sm text-green-300">
+          <div className="mb-4 rounded bg-green-50 border border-green-200 p-3 text-sm text-green-700">
             {success}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="idPeriodo" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="idPeriodo" className="block text-sm font-medium text-gray-700">
               Periodo operacional *
             </label>
             <select
@@ -170,7 +172,7 @@ export default function NuevoPAIPage() {
               value={idPeriodo}
               onChange={(e) => setIdPeriodo(e.target.value)}
               required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
             >
               <option value="">Seleccionar periodo</option>
               {periodos.map((p) => (
@@ -183,7 +185,7 @@ export default function NuevoPAIPage() {
           </div>
 
           <div>
-            <label htmlFor="objetivosOperacionales" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="objetivosOperacionales" className="block text-sm font-medium text-gray-700">
               Objetivos operacionales *
             </label>
             <textarea
@@ -192,13 +194,13 @@ export default function NuevoPAIPage() {
               onChange={(e) => setObjetivosOperacionales(e.target.value)}
               required
               rows={3}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Contener el incendio en 2 horas y evacuar el área"
             />
           </div>
 
           <div>
-            <label htmlFor="estrategias" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="estrategias" className="block text-sm font-medium text-gray-700">
               Estrategias
             </label>
             <textarea
@@ -206,13 +208,13 @@ export default function NuevoPAIPage() {
               value={estrategias}
               onChange={(e) => setEstrategias(e.target.value)}
               rows={2}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Atacar el fuego desde el norte con 2 líneas de mangueras"
             />
           </div>
 
           <div>
-            <label htmlFor="tacticas" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="tacticas" className="block text-sm font-medium text-gray-700">
               Tácticas
             </label>
             <textarea
@@ -220,13 +222,13 @@ export default function NuevoPAIPage() {
               value={tacticas}
               onChange={(e) => setTacticas(e.target.value)}
               rows={2}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Posicionar unidad 1 en entrada norte, unidad 2 en sur"
             />
           </div>
 
           <div>
-            <label htmlFor="recursosEnLugar" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="recursosEnLugar" className="block text-sm font-medium text-gray-700">
               Recursos en el lugar
             </label>
             <input
@@ -234,13 +236,13 @@ export default function NuevoPAIPage() {
               id="recursosEnLugar"
               value={recursosEnLugar}
               onChange={(e) => setRecursosEnLugar(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: 2 ambulancias, 1 unidad de bomberos"
             />
           </div>
 
           <div>
-            <label htmlFor="recursosPorSolicitar" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="recursosPorSolicitar" className="block text-sm font-medium text-gray-700">
               Recursos por solicitar
             </label>
             <input
@@ -248,13 +250,13 @@ export default function NuevoPAIPage() {
               id="recursosPorSolicitar"
               value={recursosPorSolicitar}
               onChange={(e) => setRecursosPorSolicitar(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: 1 unidad adicional de rescate"
             />
           </div>
 
           <div>
-            <label htmlFor="mensajeSeguridad" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="mensajeSeguridad" className="block text-sm font-medium text-gray-700">
               Mensaje de seguridad
             </label>
             <input
@@ -262,13 +264,13 @@ export default function NuevoPAIPage() {
               id="mensajeSeguridad"
               value={mensajeSeguridad}
               onChange={(e) => setMensajeSeguridad(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Ej: Uso obligatorio de equipo completo"
             />
           </div>
 
           <div>
-            <label htmlFor="nombreJefePlanificacion" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="nombreJefePlanificacion" className="block text-sm font-medium text-gray-700">
               Nombre del Jefe de Planificación
             </label>
             <input
@@ -276,7 +278,7 @@ export default function NuevoPAIPage() {
               id="nombreJefePlanificacion"
               value={nombreJefePlanificacion}
               onChange={(e) => setNombreJefePlanificacion(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-cyan-500 focus:outline-none"
+              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
               placeholder="Nombre del responsable"
             />
           </div>
@@ -287,15 +289,15 @@ export default function NuevoPAIPage() {
               disabled={cargando}
               className={`rounded px-6 py-2 text-sm font-medium text-white ${
                 cargando
-                  ? "cursor-not-allowed bg-slate-600"
-                  : "bg-blue-600 hover:bg-blue-500"
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-carbon hover:bg-carbon-oscuro"
               }`}
             >
               {cargando ? "Guardando..." : "Crear Plan de Acción"}
             </button>
             <Link
               href={`/incidentes/${id}`}
-              className="rounded bg-slate-700 px-6 py-2 text-sm font-medium text-white hover:bg-slate-600"
+              className="rounded bg-gray-200 px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
             >
               Cancelar
             </Link>
