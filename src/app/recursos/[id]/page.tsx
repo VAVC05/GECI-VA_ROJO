@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import BotonEliminarRecurso from "@/components/BotonEliminarRecurso";
 
 interface Asignacion {
     idAsignacion: number;
@@ -36,6 +38,8 @@ interface Recurso {
 export default function DetalleRecursoPage() {
     const params = useParams();
     const id = params.id as string;
+    const { data: session } = useSession();
+    const esAdministrador = session?.user?.rol === "Administrador";
 
     const [recurso, setRecurso] = useState<Recurso | null>(null);
     const [loading, setLoading] = useState(true);
@@ -98,7 +102,16 @@ export default function DetalleRecursoPage() {
                 </Link>
 
                 <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                    <h1 className="text-2xl font-bold text-rojo">{recurso.nombre}</h1>
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <h1 className="text-2xl font-bold text-rojo">{recurso.nombre}</h1>
+
+                        {esAdministrador && recurso.estado !== "ASIGNADO" && (
+                            <BotonEliminarRecurso
+                                recursoId={recurso.idRecurso}
+                                nombre={recurso.nombre}
+                            />
+                        )}
+                    </div>
 
                     <div className="mt-6 grid grid-cols-2 gap-4">
                         <div>

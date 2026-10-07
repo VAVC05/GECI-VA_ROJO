@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import BotonDesmovilizar from "@/components/BotonDesmovilizar";
+import BotonEliminarRecurso from "@/components/BotonEliminarRecurso";
 
 type RecursoConAsignaciones = Prisma.RecursoGetPayload<{
     include: {
@@ -23,6 +24,8 @@ export default async function RecursosPage() {
     if (!session) {
         redirect("/login");
     }
+
+    const esAdministrador = session.user?.rol === "Administrador";
 
     const recursos: RecursoConAsignaciones[] = await prisma.recurso.findMany({
         orderBy: { nombre: "asc" },
@@ -133,6 +136,12 @@ export default async function RecursosPage() {
                                                     asignacionId={asignacionActiva.idAsignacion}
                                                     recursoNombre={recurso.nombre}
                                                     incidenteFolio={asignacionActiva.incidente.folio}
+                                                />
+                                            )}
+                                            {esAdministrador && recurso.estado !== "ASIGNADO" && (
+                                                <BotonEliminarRecurso
+                                                    recursoId={recurso.idRecurso}
+                                                    nombre={recurso.nombre}
                                                 />
                                             )}
                                         </div>

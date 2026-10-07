@@ -6,9 +6,15 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 const createIncidentSchema = z.object({
-    nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+    nombre: z
+        .string()
+        .min(3, 'El nombre debe tener al menos 3 caracteres')
+        .regex(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/, 'El nombre debe contener al menos una letra'),
     tipo: z.string().min(1, 'El tipo es obligatorio'),
-    lugar: z.string().min(1, 'El lugar es obligatorio'),
+    lugar: z
+        .string()
+        .min(1, 'El lugar es obligatorio')
+        .regex(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/, 'El lugar debe contener al menos una letra'),
     fechaHoraInicio: z.string().datetime({ message: 'Fecha inválida' }),
     amenazasPresentes: z.string().optional(),
     areasAfectadas: z.string().optional(),

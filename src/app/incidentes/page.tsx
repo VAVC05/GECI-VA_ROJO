@@ -4,12 +4,15 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import BotonCerrar from "@/components/BotonCerrar";
+import BotonEliminar from "@/components/BotonEliminar";
 
 export default async function IncidentesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
     redirect("/login");
   }
+
+  const esAdministrador = session.user?.rol === "Administrador";
 
   const incidentes = await prisma.incidente.findMany({
     orderBy: { fechaHoraInicio: "desc" },
@@ -91,7 +94,6 @@ export default async function IncidentesPage() {
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-sm">
                   <div className="flex gap-2">
-                   
                     <Link
                       href={`/incidentes/${inc.idIncidente}`}
                       className="rounded bg-carbon px-3 py-1 text-xs font-medium text-white hover:bg-carbon-oscuro"
@@ -99,7 +101,6 @@ export default async function IncidentesPage() {
                       Ver
                     </Link>
 
-                    {/* Editar  */}
                     {inc.estado === "ACTIVO" && (
                       <Link
                         href={`/incidentes/${inc.idIncidente}/editar`}
@@ -109,9 +110,16 @@ export default async function IncidentesPage() {
                       </Link>
                     )}
 
-                    {/* Cerrar  */}
                     {inc.estado === "ACTIVO" && (
                       <BotonCerrar incidenteId={inc.idIncidente} nombre={inc.nombre} />
+                    )}
+
+                    {esAdministrador && (
+                      <BotonEliminar
+                        incidenteId={inc.idIncidente}
+                        folio={inc.folio}
+                        nombre={inc.nombre}
+                      />
                     )}
                   </div>
                 </td>

@@ -18,8 +18,8 @@ const updateIncidentSchema = z.object({
   mensajeSeguridad: z.string().optional(),
   canalesComunicacion: z.string().optional(),
   organizacionSCI: z.any().optional(),
-  planComunicaciones: z.any().optional(), 
-  planMedico: z.any().optional(),         
+  planComunicaciones: z.any().optional(),
+  planMedico: z.any().optional(),
 });
 
 export async function GET(
@@ -198,6 +198,18 @@ export async function PATCH(
       );
     }
 
+    // Obtener los recursos que están asignados activamente a este incidente
+    const asignacionesActivas = await prisma.asignacionRecurso.findMany({
+      where: {
+        idIncidente: idNumero,
+        fechaHoraDesmovilizacion: null,
+      },
+      select: { idRecurso: true },
+    });
+
+    const idsRecursos = asignacionesActivas.map((a) => a.idRecurso);
+
+    // Cerrar el incidente
     const cerrado = await prisma.incidente.update({
       where: { idIncidente: idNumero },
       data: {
@@ -208,6 +220,7 @@ export async function PATCH(
       },
     });
 
+    // Marcar las asignaciones como desmovilizadas
     await prisma.asignacionRecurso.updateMany({
       where: {
         idIncidente: idNumero,
@@ -219,11 +232,92 @@ export async function PATCH(
       },
     });
 
+    // Liberar los recursos para que vuelvan a estar disponibles
+    if (idsRecursos.length > 0) {
+      await prisma.recurso.updateMany({
+        where: { idRecurso: { in: idsRecursos } },
+        data: { estado: 'DISPONIBLE' },
+      });
+    }
+
     return NextResponse.json(cerrado);
   } catch (error) {
     console.error('Error en PATCH /api/incidentes/[id]/cerrar:', error);
     return NextResponse.json(
       { error: 'Error al cerrar incidente' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    if (session.user?.rol !== 'Administrador') {
+      return NextResponse.json(
+        { error: 'Solo el Administrador puede eliminar incidentes' },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const idNumero = parseInt(id);
+    if (isNaN(idNumero)) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    }
+
+    const existente = await prisma.incidente.findUnique({
+      where: { idIncidente: idNumero },
+      include: {
+        victimas: { select: { idVictima: true } },
+      },
+    });
+
+    if (!existente) {
+      return NextResponse.json({ error: 'Incidente no encontrado' }, { status: 404 });
+    }
+
+    const idsVictimas = existente.victimas.map((v) => v.idVictima);
+
+    await prisma.$transaction([
+      prisma.historialTriage.deleteMany({
+        where: { idVictima: { in: idsVictimas } },
+      }),
+      prisma.victima.deleteMany({
+        where: { idIncidente: idNumero },
+      }),
+      prisma.planAccion.deleteMany({
+        where: { periodo: { idIncidente: idNumero } },
+      }),
+      prisma.periodoOperacional.deleteMany({
+        where: { idIncidente: idNumero },
+      }),
+      prisma.formularioSci.deleteMany({
+        where: { idIncidente: idNumero },
+      }),
+      prisma.asignacionRecurso.deleteMany({
+        where: { idIncidente: idNumero },
+      }),
+      prisma.incidente.delete({
+        where: { idIncidente: idNumero },
+      }),
+    ]);
+
+    return NextResponse.json({
+      message: 'Incidente eliminado correctamente',
+      folio: existente.folio,
+    });
+  } catch (error) {
+    console.error('Error en DELETE /api/incidentes/[id]:', error);
+    return NextResponse.json(
+      { error: 'Error al eliminar incidente' },
       { status: 500 }
     );
   }

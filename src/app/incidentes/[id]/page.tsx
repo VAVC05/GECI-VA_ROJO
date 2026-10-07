@@ -21,11 +21,12 @@ interface Victima {
 // Interfaz para un recurso asignado
 interface AsignacionRecurso {
   idAsignacion: number;
-  recurso: { nombre: string; tipo: string };
+  recurso: { nombre: string; tipo: string; clase: string; institucion: string | null };
   tareaAsignada: string | null;
   ubicacionAsignacion: string | null;
   fechaHoraAsignacion: string;
   fechaHoraDesmovilizacion: string | null;
+  observacionesDesmovilizacion: string | null;
 }
 
 // Interfaz para un periodo operacional
@@ -146,6 +147,14 @@ export default function DetalleIncidentePage() {
       </main>
     );
   }
+
+  const asignaciones = incidente.asignacionesRecurso || [];
+  const asignacionesActivas = asignaciones.filter(
+    (a) => a.fechaHoraDesmovilizacion === null
+  );
+  const asignacionesHistoricas = asignaciones.filter(
+    (a) => a.fechaHoraDesmovilizacion !== null
+  );
 
   return (
     <main className="min-h-screen bg-gris text-gray-900 p-6">
@@ -308,6 +317,130 @@ export default function DetalleIncidentePage() {
               <p className="text-sm">{incidente.observacionesCierre}</p>
             </div>
           )}
+
+          {/* Recursos Asignados */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-800">Recursos Asignados</h2>
+              {incidente.estado === "ACTIVO" && (
+                <Link
+                  href={`/incidentes/${incidente.idIncidente}/asignar`}
+                  className="rounded bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-500"
+                >
+                  + Asignar recurso
+                </Link>
+              )}
+            </div>
+
+            {asignacionesActivas.length > 0 ? (
+              <div className="mt-3 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Recurso
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Tipo
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Institución
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Tarea
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Ubicación
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Asignado
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {asignacionesActivas.map((asig) => (
+                      <tr key={asig.idAsignacion} className="hover:bg-gray-50">
+                        <td className="px-3 py-2 text-sm font-medium">{asig.recurso.nombre}</td>
+                        <td className="px-3 py-2 text-sm">{asig.recurso.tipo}</td>
+                        <td className="px-3 py-2 text-sm text-gray-500">
+                          {asig.recurso.institucion || "—"}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-500">
+                          {asig.tareaAsignada || "—"}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-500">
+                          {asig.ubicacionAsignacion || "—"}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-gray-500">
+                          {new Date(asig.fechaHoraAsignacion).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-gray-500">
+                No hay recursos asignados activos a este incidente.
+                {incidente.estado === "ACTIVO" && (
+                  <span>
+                    {" "}
+                    <Link
+                      href={`/incidentes/${incidente.idIncidente}/asignar`}
+                      className="text-green-600 hover:underline"
+                    >
+                      Asigna el primero
+                    </Link>
+                    .
+                  </span>
+                )}
+              </p>
+            )}
+
+            {asignacionesHistoricas.length > 0 && (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-sm font-medium text-gray-600 hover:text-gray-800">
+                  Ver historial de recursos desmovilizados ({asignacionesHistoricas.length})
+                </summary>
+                <div className="mt-2 overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Recurso
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Tarea
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Asignado
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Desmovilizado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {asignacionesHistoricas.map((asig) => (
+                        <tr key={asig.idAsignacion} className="text-gray-500">
+                          <td className="px-3 py-2 text-sm">{asig.recurso.nombre}</td>
+                          <td className="px-3 py-2 text-sm">{asig.tareaAsignada || "—"}</td>
+                          <td className="px-3 py-2 text-sm">
+                            {new Date(asig.fechaHoraAsignacion).toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2 text-sm">
+                            {asig.fechaHoraDesmovilizacion
+                              ? new Date(asig.fechaHoraDesmovilizacion).toLocaleString()
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )}
+          </div>
 
           {/* Periodos Operacionales */}
           <div className="mt-6">

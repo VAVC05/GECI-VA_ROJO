@@ -4,11 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { esquemaLogin, type DatosLogin } from "@/lib/validaciones/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
@@ -30,16 +28,15 @@ export default function LoginPage() {
       redirect: false,
     });
 
-    setEnviando(false);
-
     if (resultado?.error) {
-      // No decimos si fue el correo o la contraseña, por seguridad.
+      setEnviando(false);
       setErrorGeneral("Correo o contraseña incorrectos.");
       return;
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    // Redirección completa del navegador para que la cookie de sesión
+    // ya esté establecida cuando el middleware la lea en /dashboard
+    window.location.href = "/dashboard";
   }
 
   return (

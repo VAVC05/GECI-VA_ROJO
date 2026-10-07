@@ -119,3 +119,81 @@ export async function PUT(
     );
   }
 }
+
+//  Eliminar recurso
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    if (session.user?.rol !== 'Administrador') {
+      return NextResponse.json(
+        { error: 'Solo el Administrador puede eliminar recursos' },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const idNumero = parseInt(id);
+    if (isNaN(idNumero)) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    }
+
+    const recursoExistente = await prisma.recurso.findUnique({
+      where: { idRecurso: idNumero },
+    });
+
+    if (!recursoExistente) {
+      return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 });
+    }
+
+    // Verificar que no tenga asignaciones activas
+    const asignacionesActivas = await prisma.asignacionRecurso.count({
+      where: {
+        idRecurso: idNumero,
+        fechaHoraDesmovilizacion: null,
+      },
+    });
+
+    if (asignacionesActivas > 0) {
+      return NextResponse.json(
+        {
+          error:
+            'No se puede eliminar un recurso con asignación activa. Desmovilízalo primero.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // historial del recurso antes de borrar
+    const asignacionesHistoricas = await prisma.asignacionRecurso.count({
+      where: { idRecurso: idNumero },
+    });
+
+    await prisma.$transaction([
+      prisma.asignacionRecurso.deleteMany({
+        where: { idRecurso: idNumero },
+      }),
+      prisma.recurso.delete({
+        where: { idRecurso: idNumero },
+      }),
+    ]);
+
+    return NextResponse.json({
+      message: 'Recurso eliminado correctamente',
+      nombre: recursoExistente.nombre,
+      asignacionesEliminadas: asignacionesHistoricas,
+    });
+  } catch (error) {
+    console.error('Error en DELETE /api/recursos/[id]:', error);
+    return NextResponse.json(
+      { error: 'Error al eliminar recurso' },
+      { status: 500 }
+    );
+  }
+}

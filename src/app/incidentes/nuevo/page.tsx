@@ -4,14 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+interface ErrorCampo {
+  nombre?: string;
+  tipo?: string;
+  lugar?: string;
+  fechaHoraInicio?: string;
+}
+
 export default function NuevoIncidentePage() {
   const router = useRouter();
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
+  const [erroresCampos, setErroresCampos] = useState<ErrorCampo>({});
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    setErroresCampos({});
     setCargando(true);
 
     const formData = new FormData(e.currentTarget);
@@ -31,8 +40,25 @@ export default function NuevoIncidentePage() {
 
       if (res.ok) {
         router.push("/incidentes");
-      } else {
-        const errorData = await res.json();
+        return;
+      }
+
+      const errorData = await res.json();
+
+      // Si el backend devuelve detalles por campo, se pintan debajo de cada input
+      if (Array.isArray(errorData.details)) {
+        const nuevosErrores: ErrorCampo = {};
+        for (const detalle of errorData.details) {
+          const campo = detalle.path?.[0] as keyof ErrorCampo;
+          if (campo) {
+            nuevosErrores[campo] = detalle.message;
+          }
+        }
+        setErroresCampos(nuevosErrores);
+      }
+
+      // Mensaje general solo si no hay errores específicos por campo
+      if (!Array.isArray(errorData.details) || errorData.details.length === 0) {
         setError(errorData.error || "Error al crear el incidente");
       }
     } catch (err) {
@@ -68,9 +94,16 @@ export default function NuevoIncidentePage() {
               id="nombre"
               name="nombre"
               required
-              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              className={`mt-1 w-full rounded border bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
+                erroresCampos.nombre
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-rojo focus:ring-rojo"
+              }`}
               placeholder="Ej: Incendio en el Mercado Central"
             />
+            {erroresCampos.nombre && (
+              <p className="mt-1 text-xs text-red-600">{erroresCampos.nombre}</p>
+            )}
           </div>
 
           <div>
@@ -82,9 +115,16 @@ export default function NuevoIncidentePage() {
               id="tipo"
               name="tipo"
               required
-              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              className={`mt-1 w-full rounded border bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
+                erroresCampos.tipo
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-rojo focus:ring-rojo"
+              }`}
               placeholder="Ej: INCENDIO, RESCATE, PREHOSPITALARIO"
             />
+            {erroresCampos.tipo && (
+              <p className="mt-1 text-xs text-red-600">{erroresCampos.tipo}</p>
+            )}
           </div>
 
           <div>
@@ -96,9 +136,16 @@ export default function NuevoIncidentePage() {
               id="lugar"
               name="lugar"
               required
-              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              className={`mt-1 w-full rounded border bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
+                erroresCampos.lugar
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-rojo focus:ring-rojo"
+              }`}
               placeholder="Ej: Mercado Central, Metepec"
             />
+            {erroresCampos.lugar && (
+              <p className="mt-1 text-xs text-red-600">{erroresCampos.lugar}</p>
+            )}
           </div>
 
           <div>
@@ -111,8 +158,15 @@ export default function NuevoIncidentePage() {
               name="fechaHoraInicio"
               required
               defaultValue={new Date().toISOString().slice(0, 16)}
-              className="mt-1 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-rojo focus:outline-none focus:ring-1 focus:ring-rojo"
+              className={`mt-1 w-full rounded border bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
+                erroresCampos.fechaHoraInicio
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-rojo focus:ring-rojo"
+              }`}
             />
+            {erroresCampos.fechaHoraInicio && (
+              <p className="mt-1 text-xs text-red-600">{erroresCampos.fechaHoraInicio}</p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-2">
