@@ -19,8 +19,6 @@
   --color-gris: #f2f2f2;
 }
 
-/* El tema institucional es claro siempre: no seguimos el modo oscuro del
-   sistema, para que el rojo/blanco se vea igual en cualquier dispositivo. */
 
 body {
   background: var(--background);

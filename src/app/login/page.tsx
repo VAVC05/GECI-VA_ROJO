@@ -34,8 +34,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirección completa del navegador para que la cookie de sesión
-    // ya esté establecida cuando el middleware la lea en /dashboard
+ 
     window.location.href = "/dashboard";
   }
 
